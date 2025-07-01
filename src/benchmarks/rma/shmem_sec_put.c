@@ -1,9 +1,10 @@
 /**
   @file shmem_put.c
   @author Michael Beebe (Texas Tech University)
+  @author Benjamin Michalowicz (Ohio State University)
 */
 
-#include "shmem_put.h"
+#include "shmem_sec_put.h"
 
 /*************************************************************
   @brief Run the bandwidth benchmark for shmem_put
@@ -11,7 +12,7 @@
   @param max_msg_size Maximum message size for test in bytes
   @param ntimes Number of repetitions to get the avgs from
  *************************************************************/
-void bench_shmem_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -57,10 +58,14 @@ void bench_shmem_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
        if (!shmem_my_pe())
-          shmem_put(dest, source, elem_count, 1);
+          shmemx_secure_put(SHMEM_CTX_DEFAULT, dest, source, elem_count * sizeof(double), 1);
+       shmem_barrier_all();
+       //shmem_put(dest, source, elem_count, 1);
 #endif
     }
     shmem_quiet();
+
+    //shmem_barrier_all();
 
     /* Stop timer */
     end_time = mysecond();
@@ -95,7 +100,7 @@ void bench_shmem_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
   @param max_msg_size Maximum message size for test in bytes
   @param ntimes Number of repetitions to get the avgs from
  *************************************************************/
-void bench_shmem_put_bibw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_sec_put_bibw(int min_msg_size, int max_msg_size, int ntimes) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -140,10 +145,10 @@ void bench_shmem_put_bibw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Perform ntimes bidirectional shmem_puts */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-       if (shmem_my_pe() == 0 )
-          shmem_put(dest, source, elem_count, 1); /* PE 0 sends to PE 1 */
+       if (shmem_my_pe() == 0)
+          shmemx_secure_put(SHMEM_CTX_DEFAULT, dest, source, elem_count * sizeof(double), 1); /* PE 0 sends to PE 1 */
        else
-          shmem_put(source, dest, elem_count, 0); /* PE 1 sends to PE 0 */
+          shmemx_secure_put(SHMEM_CTX_DEFAULT, source, dest, elem_count * sizeof(double), 0); /* PE 1 sends to PE 0 */
 #endif
     }
     shmem_quiet();
@@ -181,7 +186,7 @@ void bench_shmem_put_bibw(int min_msg_size, int max_msg_size, int ntimes) {
   @param max_msg_size Maximum message size for test in bytes
   @param ntimes Number of repetitions to get the avgs from
  *************************************************************/
-void bench_shmem_put_latency(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_sec_put_latency(int min_msg_size, int max_msg_size, int ntimes) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -223,7 +228,7 @@ void bench_shmem_put_latency(int min_msg_size, int max_msg_size, int ntimes) {
     /* Perform ntimes shmem_puts and accumulate total time */
     for (int j = 0; j < ntimes; j++) {
       double start_time = mysecond();
-      shmem_put(dest, source, elem_count, (shmem_my_pe() + 1) % 2);
+      shmemx_secure_put(SHMEM_CTX_DEFAULT, dest, source, elem_count * sizeof(long), (shmem_my_pe()+1) % 2);
       shmem_quiet();
       double end_time = mysecond();
       total_time += (end_time - start_time) * 1e6;

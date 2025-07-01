@@ -33,9 +33,19 @@ benchmark_entry_t benchmark_table[] = {
     {"shmem_put", "bibw", bench_shmem_put_bibw, NULL, NULL, false},
     {"shmem_put", "latency", bench_shmem_put_latency, NULL, NULL, false},
 
+    {"shmem_sec_put", "bw", bench_shmem_sec_put_bw, NULL, NULL, false},
+    {"shmem_sec_put", "bibw", bench_shmem_sec_put_bibw, NULL, NULL, false},
+    {"shmem_sec_put", "latency", bench_shmem_sec_put_latency, NULL, NULL, false},
+
+
     {"shmem_get", "bw", bench_shmem_get_bw, NULL, NULL, false},
     {"shmem_get", "bibw", bench_shmem_get_bibw, NULL, NULL, false},
     {"shmem_get", "latency", bench_shmem_get_latency, NULL, NULL, false},
+
+
+    {"shmem_sec_get", "bw", bench_shmem_sec_get_bw, NULL, NULL, false},
+    {"shmem_sec_get", "bibw", bench_shmem_sec_get_bibw, NULL, NULL, false},
+    {"shmem_sec_get", "latency", bench_shmem_sec_get_latency, NULL, NULL, false},
 
     {"shmem_iput", "bw", NULL, bench_shmem_iput_bw, NULL, true},
     {"shmem_iput", "bibw", NULL, bench_shmem_iput_bibw, NULL, true},

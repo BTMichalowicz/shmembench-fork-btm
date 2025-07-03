@@ -1,9 +1,10 @@
 /**
   @file shmem_get.c
   @author Michael Beebe (Texas Tech University)
+  @author Benjamin Michalowicz (Ohio State University)
 */
 
-#include "shmem_get.h"
+#include "shmem_sec_get.h"
 
 /*************************************************************
   @brief Run the bandwidth benchmark for shmem_get
@@ -11,7 +12,7 @@
   @param max_msg_size Maximum message size for test in bytes
   @param ntimes Number of repetitions to get the avgs from
  *************************************************************/
-void bench_shmem_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_sec_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -25,6 +26,7 @@ void bench_shmem_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
   /* Setup the benchmark */
   setup_bench(min_msg_size, max_msg_size, &num_sizes, &msg_sizes, &times,
               &bandwidths);
+  int rank = shmem_my_pe();
 
   /* Run the benchmark */
   for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
@@ -56,11 +58,12 @@ void bench_shmem_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Perform ntimes shmem_gets */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-       if (!shmem_my_pe())
-          shmem_get(dest, source, elem_count, 1);
+       if (!rank)
+          shmemx_secure_get(SHMEM_CTX_DEFAULT,dest, source, elem_count, 1);
 #endif
     }
     shmem_quiet();
+    shmem_barrier_all();
 
     /* Stop timer */
     end_time = mysecond();
@@ -72,8 +75,8 @@ void bench_shmem_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
     bandwidths[i] = calculate_bw(valid_size, times[i]);
 
     /* Free the buffers */
-    shmem_free(source);
-    shmem_free(dest);
+   // shmem_free(source);
+   // shmem_free(dest);
   }
 
   /* Display results */
@@ -95,7 +98,7 @@ void bench_shmem_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
   @param max_msg_size Maximum message size for test in bytes
   @param ntimes Number of repetitions to get the avgs from
  *************************************************************/
-void bench_shmem_get_bibw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_sec_get_bibw(int min_msg_size, int max_msg_size, int ntimes) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -105,6 +108,7 @@ void bench_shmem_get_bibw(int min_msg_size, int max_msg_size, int ntimes) {
   int *msg_sizes;
   double *times, *bandwidths;
   int num_sizes = 0;
+  int rank = shmem_my_pe();
 
   /* Setup the benchmark */
   setup_bench(min_msg_size, max_msg_size, &num_sizes, &msg_sizes, &times,
@@ -140,11 +144,11 @@ void bench_shmem_get_bibw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Perform ntimes bidirectional shmem_gets */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-       if (!shmem_my_pe())
-          shmem_get(dest, source, elem_count, 1); /* PE 0 gets from PE 1 */
+       if (rank == 0)
+          shmemx_secure_get(SHMEM_CTX_DEFAULT, dest, source, elem_count * sizeof(long), 1); /* PE 0 gets from PE 1 */
        else
-          shmem_get(source, dest, elem_count, 0); /* PE 1 gets from PE 0 */
-       shmem_quiet();
+          shmemx_secure_get(SHMEM_CTX_DEFAULT, source, dest, elem_count * sizeof(long), 0); /* PE 1 gets from PE 0 */
+      shmem_quiet();
 #endif
     }
 
@@ -181,7 +185,7 @@ void bench_shmem_get_bibw(int min_msg_size, int max_msg_size, int ntimes) {
   @param max_msg_size Maximum message size for test in bytes
   @param ntimes Number of repetitions to get the avgs from
  *************************************************************/
-void bench_shmem_get_latency(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_sec_get_latency(int min_msg_size, int max_msg_size, int ntimes) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -191,6 +195,7 @@ void bench_shmem_get_latency(int min_msg_size, int max_msg_size, int ntimes) {
   int *msg_sizes;
   double *times, *latencies;
   int num_sizes = 0;
+  int rank = shmem_my_pe();
 
   /* Setup the benchmark */
   setup_bench(min_msg_size, max_msg_size, &num_sizes, &msg_sizes, &times,
@@ -212,6 +217,7 @@ void bench_shmem_get_latency(int min_msg_size, int max_msg_size, int ntimes) {
     /* Initialize source buffer */
     for (int j = 0; j < elem_count; j++) {
       source[j] = j;
+      dest[j] = (j*2 % 5);
     }
 
     /* Initialize total time */
@@ -224,7 +230,7 @@ void bench_shmem_get_latency(int min_msg_size, int max_msg_size, int ntimes) {
     for (int j = 0; j < ntimes; j++) {
       double start_time = mysecond();
 #if defined(USE_14) || defined(USE_15)
-      shmem_get(dest, source, elem_count, (shmem_my_pe()+1)%2);
+      shmemx_secure_get(SHMEM_CTX_DEFAULT, dest, source, elem_count, (rank+1) % 2);
       shmem_quiet();
 #endif
       double end_time = mysecond();
@@ -238,8 +244,8 @@ void bench_shmem_get_latency(int min_msg_size, int max_msg_size, int ntimes) {
     latencies[i] = times[i];
 
     /* Free the buffers */
-    shmem_free(source);
-    shmem_free(dest);
+    //shmem_free(source);
+    //shmem_free(dest);
   }
 
   /* Display results */

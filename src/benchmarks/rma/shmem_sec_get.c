@@ -59,7 +59,7 @@ void bench_shmem_sec_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
        if (!rank)
-          shmemx_secure_get(SHMEM_CTX_DEFAULT,dest, source, elem_count, 1);
+          shmemx_secure_get(SHMEM_CTX_DEFAULT,dest, source, elem_count*sizeof(long), 1);
 #endif
     }
     shmem_quiet();

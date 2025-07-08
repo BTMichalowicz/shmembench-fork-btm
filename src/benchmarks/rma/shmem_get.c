@@ -57,7 +57,7 @@ void bench_shmem_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
        if (!shmem_my_pe())
-          shmem_get(dest, source, elem_count, 1);
+          shmem_getmem(dest, source, elem_count*sizeof(long), 1);
 #endif
     }
     shmem_quiet();

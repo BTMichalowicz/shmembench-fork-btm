@@ -60,9 +60,20 @@ benchmark_entry_t benchmark_table[] = {
     {"shmem_put_nbi", "latency", bench_shmem_put_nbi_latency, NULL, NULL,
      false},
 
+    {"shmem_sec_put_nbi", "bw", bench_shmem_sec_put_nbi_bw, NULL, NULL, false},
+    {"shmem_sec_put_nbi", "bibw", bench_shmem_sec_put_nbi_bibw, NULL, NULL, false},
+    {"shmem_sec_put_nbi", "latency", bench_shmem_sec_put_nbi_latency, NULL, NULL,
+     false},
+
+
     {"shmem_get_nbi", "bw", bench_shmem_get_nbi_bw, NULL, NULL, false},
     {"shmem_get_nbi", "bibw", bench_shmem_get_nbi_bibw, NULL, NULL, false},
     {"shmem_get_nbi", "latency", bench_shmem_get_nbi_latency, NULL, NULL,
+     false},
+
+    {"shmem_sec_get_nbi", "bw", bench_shmem_sec_get_nbi_bw, NULL, NULL, false},
+    {"shmem_sec_get_nbi", "bibw", bench_shmem_sec_get_nbi_bibw, NULL, NULL, false},
+    {"shmem_sec_get_nbi", "latency", bench_shmem_sec_get_nbi_latency, NULL, NULL,
      false},
 
     {"shmem_alltoall", "bw", bench_shmem_alltoall_bw, NULL, NULL, false},

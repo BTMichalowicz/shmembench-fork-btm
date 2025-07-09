@@ -11,7 +11,7 @@
   @param max_msg_size Maximum message size for test in bytes
   @param ntimes Number of repetitions to get the avgs from
  *************************************************************/
-void bench_shmem_get_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_sec_get_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -56,7 +56,7 @@ void bench_shmem_get_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Perform ntimes shmem_get_nbis */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-      shmem_getmem_nbi(dest, source, elem_count*sizeof(long), 1);
+      shmemx_get_nbi(SHMEM_CTX_DEFAULT, dest, source, elem_count*sizeof(long), 1);
 #endif
     }
     shmem_quiet();
@@ -94,7 +94,7 @@ void bench_shmem_get_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) {
   @param max_msg_size Maximum message size for test in bytes
   @param ntimes Number of repetitions to get the avgs from
  *************************************************************/
-void bench_shmem_get_nbi_bibw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_sec_get_nbi_bibw(int min_msg_size, int max_msg_size, int ntimes) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -178,7 +178,7 @@ void bench_shmem_get_nbi_bibw(int min_msg_size, int max_msg_size, int ntimes) {
   @param max_msg_size Maximum message size for test in bytes
   @param ntimes Number of repetitions to get the avgs from
  *************************************************************/
-void bench_shmem_get_nbi_latency(int min_msg_size, int max_msg_size,
+void bench_shmem_sec_get_nbi_latency(int min_msg_size, int max_msg_size,
                                  int ntimes) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {

@@ -56,7 +56,7 @@ void bench_shmem_put_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Perform ntimes shmem_put_nbis */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-      shmem_put_nbi(dest, source, elem_count, 1);
+      shmem_putmem_nbi(dest, source, elem_count*sizeof(long), 1);
 #endif
     }
     shmem_quiet();

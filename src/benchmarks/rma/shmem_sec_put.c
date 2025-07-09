@@ -5,6 +5,7 @@
 */
 
 #include "shmem_sec_put.h"
+#include "shmemx.h"
 
 /*************************************************************
   @brief Run the bandwidth benchmark for shmem_put

@@ -16,6 +16,8 @@
 #include "../benchmarks/rma/shmem_put_nbi.h"
 #include "../benchmarks/rma/shmem_sec_put.h"
 #include "../benchmarks/rma/shmem_sec_get.h"
+#include "../benchmarks/rma/shmem_sec_put_nbi.h"
+#include "../benchmarks/rma/shmem_sec_get_nbi.h"
 
 
 /* Collective benchmarks */

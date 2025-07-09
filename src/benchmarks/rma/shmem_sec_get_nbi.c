@@ -4,7 +4,7 @@
 */
 
 #include "shmem_get_nbi.h"
-
+#include "shmemx.h"
 /*************************************************************
   @brief Run the bandwidth benchmark for shmem_get_nbi
   @param min_msg_size Minimum message size for test in bytes
@@ -56,7 +56,7 @@ void bench_shmem_sec_get_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) 
     /* Perform ntimes shmem_get_nbis */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-      shmemx_get_nbi(SHMEM_CTX_DEFAULT, dest, source, elem_count*sizeof(long), 1);
+      shmemx_secure_get_nbi(SHMEM_CTX_DEFAULT, dest, source, elem_count*sizeof(long), 1);
 #endif
     }
     shmem_quiet();

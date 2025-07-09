@@ -4,7 +4,7 @@
 */
 
 #include "shmem_put_nbi.h"
-
+#include "shmemx.h"
 /*************************************************************
   @brief Run the bandwidth benchmark for shmem_put_nbi
   @param min_msg_size Minimum message size for test in bytes
@@ -56,7 +56,8 @@ void bench_shmem_sec_put_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) 
     /* Perform ntimes shmem_put_nbis */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-      shmemx_secure_put_nbi(SHMEM_CTX_DEFAULT, dest, source, elem_count*sizeof(long), 1);
+      if (shmem_my_pe() == 0)
+          shmemx_secure_put_nbi(SHMEM_CTX_DEFAULT, dest, source, elem_count*sizeof(long), 1);
 #endif
     }
     shmem_quiet();
@@ -222,7 +223,8 @@ void bench_shmem_sec_put_nbi_latency(int min_msg_size, int max_msg_size,
     for (int j = 0; j < ntimes; j++) {
       double start_time = mysecond();
 #if defined(USE_14) || defined(USE_15)
-      shmem_put_nbi(dest, source, elem_count, 1);
+      if (shmem_my_pe() == 0)
+          shmem_put_nbi(dest, source, elem_count, 1);
       shmem_quiet();
 #endif
       double end_time = mysecond();

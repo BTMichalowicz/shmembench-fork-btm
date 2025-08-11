@@ -38,15 +38,20 @@ void bench_shmem_alltoall_bw(int min_msg_size, int max_msg_size, int ntimes) {
   shmem_barrier_all();
 #endif
 
+    /* Source and destination arrays for shmem_alltoall */
+    char *source = (char *)shmem_malloc(max_msg_size * npes);
+    char *dest = (char *)shmem_malloc(max_msg_size * npes);
+    int i = 0;
+    for (i = 0; i< max_msg_size * npes; i++){
+        source[i] = 'a'+(i%26);
+    }
+
   /* Run the benchmark */
   for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
     /* Validate the message size for the long datatype */
-    int valid_size = validate_typed_size(size, sizeof(long), "long");
+    int valid_size = validate_typed_size(size, sizeof(char), "char");
     msg_sizes[i] = valid_size;
 
-    /* Source and destination arrays for shmem_alltoall */
-    long *source = (long *)shmem_malloc(valid_size * npes * sizeof(long));
-    long *dest = (long *)shmem_malloc(valid_size * npes * sizeof(long));
 
     /* Initialize source buffer */
     for (int j = 0; j < valid_size * npes; j++) {
@@ -81,12 +86,9 @@ void bench_shmem_alltoall_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Calculate bandwidth */
     bandwidths[i] = calculate_bw(valid_size * npes * sizeof(long), times[i]);
 
-    /* Free the buffers */
-    shmem_free(source);
-    shmem_free(dest);
-  }
+    }
 
-  /* Display results */
+   /* Display results */
   shmem_barrier_all();
   if (shmem_my_pe() == 0) {
     display_results(times, msg_sizes, bandwidths, "bw", num_sizes);
@@ -97,6 +99,12 @@ void bench_shmem_alltoall_bw(int min_msg_size, int max_msg_size, int ntimes) {
   free(msg_sizes);
   free(times);
   free(bandwidths);
+ /* Free the buffers */
+    shmem_free(source);
+    shmem_free(dest);
+
+
+
 }
 
 /*************************************************************

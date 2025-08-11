@@ -56,7 +56,8 @@ void bench_shmem_sec_get_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) 
     /* Perform ntimes shmem_get_nbis */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-      shmemx_secure_get_nbi(SHMEM_CTX_DEFAULT, dest, source, elem_count*sizeof(long), 1);
+        if (shmem_my_pe() == 0)
+            shmemx_secure_get_nbi(SHMEM_CTX_DEFAULT, dest, source, elem_count*sizeof(long), 1);
 #endif
     }
     shmem_quiet();
@@ -71,8 +72,8 @@ void bench_shmem_sec_get_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) 
     bandwidths[i] = calculate_bw(valid_size, times[i]);
 
     /* Free the buffers */
-    shmem_free(source);
-    shmem_free(dest);
+   // shmem_free(source);
+   // shmem_free(dest);
   }
 
   /* Display results */

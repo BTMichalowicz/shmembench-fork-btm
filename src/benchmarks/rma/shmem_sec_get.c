@@ -64,8 +64,7 @@ void bench_shmem_sec_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
 #endif
     }
     shmem_quiet();
-    shmem_barrier_all();
-
+   
     /* Stop timer */
     end_time = mysecond();
 

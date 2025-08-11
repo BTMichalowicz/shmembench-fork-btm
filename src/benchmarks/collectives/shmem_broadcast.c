@@ -40,8 +40,14 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
   int npes = shmem_n_pes();
 #endif
 
+ /* Allocate memory for source and destination arrays */
+    long *source = (long *)shmem_malloc(max_msg_size);
+    long *dest = (long *)shmem_malloc(max_msg_size);
+
   /* Loop through each message size, doubling the size at each iteration */
   for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
+      memset(source, 1234, max_msg_size);
+      memset(dest, 0, max_msg_size);
     /* Validate the message size for the long datatype */
     int valid_size = validate_typed_size(size, sizeof(long), "long");
     msg_sizes[i] = valid_size;
@@ -49,10 +55,7 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Calculate the number of elements based on the validated size */
     int elem_count = calculate_elem_count(valid_size, sizeof(long));
 
-    /* Allocate memory for source and destination arrays */
-    long *source = (long *)shmem_malloc(elem_count * sizeof(long));
-    long *dest = (long *)shmem_malloc(elem_count * sizeof(long));
-
+   
     /* Initialize the source buffer with data */
     for (int j = 0; j < elem_count; j++) {
       source[j] = j;
@@ -81,8 +84,8 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
     bandwidths[i] = calculate_bw(valid_size, times[i]);
 
     /* Free the allocated memory for source and destination arrays */
-    shmem_free(source);
-    shmem_free(dest);
+  //  shmem_free(source);
+  //  shmem_free(dest);
   }
 
   /* Synchronize all PEs before displaying the results */
@@ -97,6 +100,8 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
   free(msg_sizes);
   free(times);
   free(bandwidths);
+  shmem_free (source);
+  shmem_free (dest);
 }
 
 /*************************************************************

@@ -56,7 +56,8 @@ void bench_shmem_get_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Perform ntimes shmem_get_nbis */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-      shmem_getmem_nbi(dest, source, elem_count*sizeof(long), 1);
+        if (!shmem_my_pe())
+            shmem_getmem_nbi(dest, source, elem_count*sizeof(long), 1);
 #endif
     }
     shmem_quiet();

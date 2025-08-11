@@ -60,8 +60,7 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
 #if defined(USE_14) || defined(USE_15)
        if (!shmem_my_pe())
           shmemx_secure_put(SHMEM_CTX_DEFAULT, dest, source, elem_count *sizeof(long), 1);
-       shmem_barrier_all();
-       //shmem_put(dest, source, elem_count, 1);
+             //shmem_put(dest, source, elem_count, 1);
 #endif
     }
     shmem_quiet();

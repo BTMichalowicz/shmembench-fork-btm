@@ -56,7 +56,7 @@ void bench_shmem_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Perform ntimes shmem_puts */
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
-       if (!shmem_my_pe())
+       if (shmem_my_pe() == 0)
           shmem_putmem(dest, source, elem_count*sizeof(long), 1);
 #endif
     }

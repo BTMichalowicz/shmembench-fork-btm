@@ -39,12 +39,17 @@ void bench_shmem_sec_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
     int elem_count = calculate_elem_count(valid_size, sizeof(long));
 
     /* Source and destination arrays for the shmem_get */
-    long *source = (long *)shmem_malloc(elem_count * sizeof(long));
-    long *dest = (long *)shmem_malloc(elem_count * sizeof(long));
+    char *source = (char *)shmem_malloc(elem_count * sizeof(long));
+    char *dest = (char *)shmem_malloc(elem_count * sizeof(long));
+
+    int count = 0;
 
     /* Initialize source buffer */
-    for (int j = 0; j < elem_count; j++) {
-      source[j] = j;
+    for (int j = 0; j < size; j++) {
+      source[j] = 'a' + (count++) ;
+      if (count == 26){
+         count = 0;
+      }
     }
 
     /* Initialize start and end time */

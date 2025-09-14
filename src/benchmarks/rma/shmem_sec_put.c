@@ -31,19 +31,23 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
   /* Run the benchmark */
   for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
     /* Validate the message size for the long datatype */
-    int valid_size = validate_typed_size(size, sizeof(long), "long");
+    int valid_size = validate_typed_size(size, sizeof(char), "char");
     msg_sizes[i] = valid_size;
     
     /* Calculate the number of elements based on the validated size */
-    int elem_count = calculate_elem_count(valid_size, sizeof(long));
+    int elem_count = calculate_elem_count(valid_size, sizeof(char));
 
     /* Source and destination arrays for the shmem_put */
-    long *source = (long *)shmem_malloc(elem_count * sizeof(long));
-    long *dest = (long *)shmem_malloc(elem_count * sizeof(long));
+    char *source = (char *)shmem_malloc(size);
+    char *dest = (char *)shmem_malloc(size);
 
     /* Initialize source buffer */
-    for (int j = 0; j < elem_count; j++) {
-      source[j] = j;
+    int count = 0;
+    for (int j = 0; j < size; j++) {
+      source[j] = 'a' + (count);
+      count++;
+      if (count==26) count = 0;
+
     }
 
     /* Initialize start and end time */
@@ -59,7 +63,7 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
     for (int j = 0; j < ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
        if (!shmem_my_pe())
-          shmemx_secure_put(SHMEM_CTX_DEFAULT, dest, source, elem_count *sizeof(long), 1);
+          shmemx_secure_put(SHMEM_CTX_DEFAULT, dest, source, elem_count, 1);
              //shmem_put(dest, source, elem_count, 1);
 #endif
     }

@@ -38,8 +38,8 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
     int elem_count = calculate_elem_count(valid_size, sizeof(char));
 
     /* Source and destination arrays for the shmem_put */
-    char *source = (char *)shmem_malloc(size);
-    char *dest = (char *)shmem_malloc(size);
+    char *source = (char *)shmem_malloc(size + 400);
+    char *dest = (char *)shmem_malloc(size + 400);
 
     /* Initialize source buffer */
     int count = 0;
@@ -64,6 +64,16 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
 #if defined(USE_14) || defined(USE_15)
        if (!shmem_my_pe())
           shmemx_secure_put(SHMEM_CTX_DEFAULT, dest, source, elem_count, 1);
+       memset(source, 0, elem_count+400);
+       memset((dest), 0, elem_count+400);
+       for (int j = 0; j < size; j++) {
+          source[j] = 'a' + (count);
+          count++;
+          if (count==26) count = 0;
+
+       }
+
+
              //shmem_put(dest, source, elem_count, 1);
 #endif
     }
@@ -81,8 +91,8 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
     bandwidths[i] = calculate_bw(valid_size, times[i]);
 
     /* Free the buffers */
-    //shmem_free(source);
-    //shmem_free(dest);
+      shmem_free(source);
+    shmem_free(dest);
   }
 
   /* Display results */

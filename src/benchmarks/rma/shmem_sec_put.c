@@ -42,39 +42,30 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
     char *dest = (char *)shmem_malloc(size + 400);
 
     /* Initialize source buffer */
-    int count = 0;
-    for (int j = 0; j < size; j++) {
-      source[j] = 'a' + (count);
-      count++;
-      if (count==26) count = 0;
-
-    }
-
+   
     /* Initialize start and end time */
     double start_time, end_time;
 
     /* Sync PEs */
     shmem_barrier_all();
+    int count = 0;
+    for (int j = 0; j < size; j++) {
+       source[j] = 'a' + (count);
+       dest[j] = 0;
+        count++;
+        if (count==26) count = 0;
+    }
+
 
     /* Start timer */
     start_time = mysecond();
 
     /* Perform ntimes shmem_puts */
     for (int j = 0; j < ntimes; j++) {
+   
 #if defined(USE_14) || defined(USE_15)
-       if (!shmem_my_pe())
+       if (shmem_my_pe() == 0)
           shmemx_secure_put(SHMEM_CTX_DEFAULT, dest, source, elem_count, 1);
-       memset(source, 0, elem_count+400);
-       memset((dest), 0, elem_count+400);
-       for (int j = 0; j < size; j++) {
-          source[j] = 'a' + (count);
-          count++;
-          if (count==26) count = 0;
-
-       }
-
-
-             //shmem_put(dest, source, elem_count, 1);
 #endif
     }
     shmem_quiet();
@@ -91,7 +82,7 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
     bandwidths[i] = calculate_bw(valid_size, times[i]);
 
     /* Free the buffers */
-      shmem_free(source);
+   shmem_free(source);
     shmem_free(dest);
   }
 

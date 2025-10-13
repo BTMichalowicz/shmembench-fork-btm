@@ -1,6 +1,6 @@
 CC = oshcc
-CFLAGS = -std=gnu11 -Wall -I./src/include -O2
-LDFLAGS =
+CFLAGS = -std=gnu11 -Wall -I./src/include -O2 -I/global/software/rocky-9.x86_64/modules/gcc/11/hpcx/2.22.1/sharp/include/sharp
+LDFLAGS = -Wl,-rpath,/global/software/rocky-9.x86_64/modules/gcc/11/hpcx/2.22.1/sharp/lib -L/global/software/rocky-9.x86_64/modules/gcc/11/hpcx/2.22.1/sharp/lib -lsharp -lsharp_coll
 
 SRC_DIR = ./src
 RS_SRC_DIR = ./rs

@@ -192,6 +192,7 @@ void display_help() {
   printf("                            shmem_fcollect\n");
   printf("                            shmem_fcollectmem\n");
   printf("                            shmem_barrier_all\n");
+  printf("                            shmem_reduce\n");
   printf("\n");
   printf("                            shmem_atomic_add\n");
   printf("                            shmem_atomic_compare_swap\n");

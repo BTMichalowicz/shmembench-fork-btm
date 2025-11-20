@@ -40,14 +40,16 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
   int npes = shmem_n_pes();
 #endif
 
- /* Allocate memory for source and destination arrays */
-    long *source = (long *)shmem_malloc(max_msg_size);
-    long *dest = (long *)shmem_malloc(max_msg_size);
 
-  /* Loop through each message size, doubling the size at each iteration */
+   /* Loop through each message size, doubling the size at each iteration */
   for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
-      memset(source, 1234, max_msg_size);
-      memset(dest, 0, max_msg_size);
+      /* Allocate memory for source and destination arrays */
+    char *source = (char *)shmem_malloc(size + 32);
+    char *dest = (char *)shmem_malloc(size +32);
+
+     //    memset(source, 1234, max_msg_size);
+      memset(dest, 0, size+32);
+
     /* Validate the message size for the long datatype */
     int valid_size = validate_typed_size(size, sizeof(long), "long");
     msg_sizes[i] = valid_size;
@@ -57,8 +59,8 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
 
    
     /* Initialize the source buffer with data */
-    for (int j = 0; j < elem_count; j++) {
-      source[j] = j;
+    for (int j = 0; j < valid_size; j++) {
+      source[j] = 'a' + (j % 26);
     }
 
     double start_time, end_time;
@@ -70,10 +72,13 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Perform the shmem_broadcast operation for the specified number of times
      */
     for (int j = 0; j < ntimes; j++) {
+       for (int k = 0; k < valid_size; k++) {
+          source[k] = 'a' + (k % 26);
+       }
 #if defined(USE_14)
-      shmem_broadcast64(dest, source, elem_count, 0, 0, 0, npes, pSync);
+      shmem_broadcast64(dest, source, valid_size, 0, 0, 0, npes, pSync);
 #elif defined(USE_15)
-      shmem_broadcast(SHMEM_TEAM_WORLD, dest, source, elem_count, 0);
+      shmem_broadcast(SHMEM_TEAM_WORLD, dest, source, valid_size, 0);
 #endif
     }
     shmem_quiet();
@@ -84,8 +89,8 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
     bandwidths[i] = calculate_bw(valid_size, times[i]);
 
     /* Free the allocated memory for source and destination arrays */
-  //  shmem_free(source);
-  //  shmem_free(dest);
+    shmem_free(source);
+    shmem_free(dest);
   }
 
   /* Synchronize all PEs before displaying the results */
@@ -100,8 +105,6 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
   free(msg_sizes);
   free(times);
   free(bandwidths);
-  shmem_free (source);
-  shmem_free (dest);
 }
 
 /*************************************************************

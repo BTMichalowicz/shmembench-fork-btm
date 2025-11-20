@@ -39,8 +39,8 @@ void bench_shmem_sec_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
     int elem_count = calculate_elem_count(valid_size, sizeof(long));
 
     /* Source and destination arrays for the shmem_get */
-    char *source = (char *)shmem_malloc(elem_count * sizeof(long));
-    char *dest = (char *)shmem_malloc(elem_count * sizeof(long));
+    char *source = (char *)shmem_malloc(elem_count * sizeof(long) + 400);
+    char *dest = (char *)shmem_malloc(elem_count * sizeof(long) + 400);
 
     int count = 0;
 
@@ -68,12 +68,23 @@ void bench_shmem_sec_get_bw(int min_msg_size, int max_msg_size, int ntimes) {
           shmemx_secure_get(SHMEM_CTX_DEFAULT,dest, source, elem_count*sizeof(long), 1);
 #endif
     }
+
+    shmem_quiet();
+    shmem_barrier_all();
+   // fprintf(stderr, "des for byte count %d: %s\n", size, (char *)dest);
+
+//    if (rank == 0){
+//       fprintf(stderr, "dest (bytes: %d: %s\n", size, dest);
+//    }
     shmem_quiet();
    
     /* Stop timer */
     end_time = mysecond();
 
-    /* Calculate average time per operation in useconds */
+    shmem_barrier_all();
+
+
+       /* Calculate average time per operation in useconds */
     times[i] = (end_time - start_time) * 1e6 / ntimes;
 
     /* Calculate bandwidth using actual bytes transferred */

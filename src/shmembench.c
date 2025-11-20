@@ -77,8 +77,8 @@ benchmark_entry_t benchmark_table[] = {
      false},
 
     {"shmem_alltoall", "bw", bench_shmem_alltoall_bw, NULL, NULL, false},
-    {"shmem_alltoall", "latency", bench_shmem_alltoall_latency, NULL, NULL,
-     false},
+    //{"shmem_alltoall", "latency", bench_shmem_alltoall_latency, NULL, NULL,
+    // false},
 
     {"shmem_alltoalls", "bw", bench_shmem_alltoalls_bw, NULL, NULL, false},
     {"shmem_alltoalls", "latency", bench_shmem_alltoalls_latency, NULL, NULL,

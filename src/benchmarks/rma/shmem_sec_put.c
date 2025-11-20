@@ -64,11 +64,13 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
     for (int j = 0; j < ntimes; j++) {
    
 #if defined(USE_14) || defined(USE_15)
-       if (shmem_my_pe() == 0)
+       if (shmem_my_pe() == 0){
           shmemx_secure_put(SHMEM_CTX_DEFAULT, dest, source, elem_count, 1);
+       } 
+               
 #endif
     }
-    shmem_quiet();
+    //shmem_quiet();
 
     //shmem_barrier_all();
 
@@ -83,7 +85,10 @@ void bench_shmem_sec_put_bw(int min_msg_size, int max_msg_size, int ntimes) {
 
     /* Free the buffers */
    shmem_free(source);
-    shmem_free(dest);
+    //shmem_free(dest);
+    //if (shmem_my_pe()){
+    //   fprintf(stderr, "dest for %d: %s\n", size, dest);
+   // }
   }
 
   /* Display results */

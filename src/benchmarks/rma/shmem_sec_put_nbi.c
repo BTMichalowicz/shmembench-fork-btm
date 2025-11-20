@@ -36,13 +36,22 @@ void bench_shmem_sec_put_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) 
     int elem_count = calculate_elem_count(valid_size, sizeof(long));
 
     /* Source and destination arrays for the shmem_put_nbi */
-    long *source = (long *)shmem_malloc(elem_count * sizeof(long));
-    long *dest = (long *)shmem_malloc(elem_count * sizeof(long));
+    char *source = (long *)shmem_malloc(elem_count * sizeof(long)+500);
+    char *dest = (long *)shmem_malloc(elem_count * sizeof(long)+500);
 
     /* Initialize source buffer */
-    for (int j = 0; j < elem_count; j++) {
-      source[j] = j;
+  
+    int count = 0;
+
+    /* Initialize source buffer */
+    for (int j = 0; j < size; j++) {
+      source[j] = 'a' + (count++) ;
+      if (count == 26){
+         count = 0;
+      }
     }
+
+
 
     /* Initialize start and end time */
     double start_time, end_time;
@@ -64,6 +73,7 @@ void bench_shmem_sec_put_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) 
 
     /* Stop timer */
     end_time = mysecond();
+    shmem_barrier_all();
 
     /* Calculate average time per operation in useconds */
     times[i] = (end_time - start_time) * 1e6 / ntimes;
@@ -72,8 +82,8 @@ void bench_shmem_sec_put_nbi_bw(int min_msg_size, int max_msg_size, int ntimes) 
     bandwidths[i] = calculate_bw(valid_size, times[i]);
 
     /* Free the buffers */
- //   shmem_free(source);
- //   shmem_free(dest);
+    //shmem_free(source);
+    //shmem_free(dest);
   }
 
   /* Display results */

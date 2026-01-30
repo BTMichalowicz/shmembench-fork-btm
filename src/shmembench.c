@@ -93,13 +93,7 @@ benchmark_entry_t benchmark_table[] = {
 
 /**
   @brief Run the selected benchmark
-  @param benchmark The benchmark to be run (e.g., "shmem_put", "shmem_get")
-  @param benchtype The type of benchmark to run, either "bw", "bibw", or
- "latency"
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of times the benchmark should run
-  @param stride Stride value to use for the benchmark (only used if applicable)
+  @param opts Benchmark options given by the user 
  */
 void run_benchmark(options * opts) {
   for (int i = 0; i < sizeof(benchmark_table) / sizeof(benchmark_entry_t);

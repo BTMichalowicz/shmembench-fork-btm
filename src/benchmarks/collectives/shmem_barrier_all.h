@@ -17,7 +17,7 @@
 
 /**
   @brief Run the latency benchmark for shmem_barrier_all
-  @param ntimes Number of times to repeat the operation
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_barrier_all_latency(options * opts);
 

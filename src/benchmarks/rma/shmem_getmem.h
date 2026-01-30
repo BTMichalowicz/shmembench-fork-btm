@@ -11,17 +11,13 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_getmem
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of repetitions to get the avgs from
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_getmem_bw(options * opts);
 
 /**
   @brief Run the bidirectional bandwidth benchmark for shmem_getmem
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of repetitions to get the avgs from
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_getmem_bibw(options * opts);
 

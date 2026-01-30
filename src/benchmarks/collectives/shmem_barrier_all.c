@@ -7,9 +7,9 @@
 
 /**
   @brief Run the latency benchmark for shmem_barrier_all
-  @param ntimes Number of times to repeat the operation
+  @param opts Benchmarks options given by the user 
  */
-void bench_shmem_barrier_all_latency(int ntimes) {
+void bench_shmem_barrier_all_latency(options * opts) {
   if (!check_if_atleast_2_pes()) {
     return;
   }
@@ -20,16 +20,23 @@ void bench_shmem_barrier_all_latency(int ntimes) {
   /* Sync all PEs before starting the timer */
   shmem_barrier_all();
 
+  /* Do warmup runs */
+  for (int i = 0; i < opts->warmups; i++) {
+    shmem_barrier_all();
+  }
+
+  shmem_barrier_all();
+
   start_time = mysecond();
 
-  for (int i = 0; i < ntimes; i++) {
+  for (int i = 0; i < opts->ntimes; i++) {
     shmem_barrier_all();
   }
 
   end_time = mysecond();
 
   total_time = (end_time - start_time) * 1e6;
-  avg_time = total_time / ntimes;
+  avg_time = total_time / opts->ntimes;
 
   shmem_barrier_all();
   if (shmem_my_pe() == 0) {
@@ -37,7 +44,7 @@ void bench_shmem_barrier_all_latency(int ntimes) {
     printf("===        shmem_barrier_all Latency       ===\n");
     printf("==============================================\n");
     printf("Avg Time per Barrier (us): %.2f\n", avg_time);
-    printf("Total Time for %d Barriers (us): %.2f\n", ntimes, total_time);
+    printf("Total Time for %d Barriers (us): %.2f\n", opts->ntimes, total_time);
     printf("==============================================\n\n");
   }
 

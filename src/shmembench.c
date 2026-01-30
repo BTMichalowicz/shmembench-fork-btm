@@ -29,67 +29,67 @@ typedef struct {
 /* Dispatch table for benchmarks */
 benchmark_entry_t benchmark_table[] = {
     {"shmem_put", "bw", bench_shmem_put_bw, NULL, NULL, false},
-    {"shmem_put", "bibw", bench_shmem_put_bibw, NULL, NULL, false}, // done
+    {"shmem_put", "bibw", bench_shmem_put_bibw, NULL, NULL, false}, 
 
     {"shmem_get", "bw", bench_shmem_get_bw, NULL, NULL, false},
-    {"shmem_get", "bibw", bench_shmem_get_bibw, NULL, NULL, false}, // done
+    {"shmem_get", "bibw", bench_shmem_get_bibw, NULL, NULL, false}, 
 
     {"shmem_putmem", "bw", bench_shmem_putmem_bw, NULL, NULL, false},
-    {"shmem_putmem", "bibw", bench_shmem_putmem_bibw, NULL, NULL, false}, // done
+    {"shmem_putmem", "bibw", bench_shmem_putmem_bibw, NULL, NULL, false}, 
 
     {"shmem_getmem", "bw", bench_shmem_getmem_bw, NULL, NULL, false},
-    {"shmem_getmem", "bibw", bench_shmem_getmem_bibw, NULL, NULL, false}, // done
+    {"shmem_getmem", "bibw", bench_shmem_getmem_bibw, NULL, NULL, false}, 
 
     {"shmem_iput", "bw", NULL, bench_shmem_iput_bw, NULL, true},
-    {"shmem_iput", "bibw", NULL, bench_shmem_iput_bibw, NULL, true}, // done
+    {"shmem_iput", "bibw", NULL, bench_shmem_iput_bibw, NULL, true}, 
  
     {"shmem_iget", "bw", NULL, bench_shmem_iget_bw, NULL, true},
-    {"shmem_iget", "bibw", NULL, bench_shmem_iget_bibw, NULL, true}, // done 2
+    {"shmem_iget", "bibw", NULL, bench_shmem_iget_bibw, NULL, true}, 
 
     {"shmem_put_nbi", "bw", bench_shmem_put_nbi_bw, NULL, NULL, false},
-    {"shmem_put_nbi", "bibw", bench_shmem_put_nbi_bibw, NULL, NULL, false}, // done 2
+    {"shmem_put_nbi", "bibw", bench_shmem_put_nbi_bibw, NULL, NULL, false},
 
     {"shmem_get_nbi", "bw", bench_shmem_get_nbi_bw, NULL, NULL, false},
-    {"shmem_get_nbi", "bibw", bench_shmem_get_nbi_bibw, NULL, NULL, false}, //done 2
+    {"shmem_get_nbi", "bibw", bench_shmem_get_nbi_bibw, NULL, NULL, false},
 
     {"shmem_putmem_nbi", "bw", bench_shmem_putmem_nbi_bw, NULL, NULL, false},
-    {"shmem_putmem_nbi", "bibw", bench_shmem_putmem_nbi_bibw, NULL, NULL, false}, // done 2
+    {"shmem_putmem_nbi", "bibw", bench_shmem_putmem_nbi_bibw, NULL, NULL, false},
 
     {"shmem_getmem_nbi", "bw", bench_shmem_getmem_nbi_bw, NULL, NULL, false},
-    {"shmem_getmem_nbi", "bibw", bench_shmem_getmem_nbi_bibw, NULL, NULL, false}, // done
+    {"shmem_getmem_nbi", "bibw", bench_shmem_getmem_nbi_bibw, NULL, NULL, false}, 
 
-    {"shmem_alltoall", "bw", bench_shmem_alltoall_bw, NULL, NULL, false}, // done 3
-    {"shmem_alltoallmem", "bw", bench_shmem_alltoallmem_bw, NULL, NULL, false}, // done 3
+    {"shmem_alltoall", "bw", bench_shmem_alltoall_bw, NULL, NULL, false}, 
+    {"shmem_alltoallmem", "bw", bench_shmem_alltoallmem_bw, NULL, NULL, false},
 
-    {"shmem_alltoalls", "bw", bench_shmem_alltoalls_bw, NULL, NULL, false}, // done 3
-    {"shmem_alltoallsmem", "bw", bench_shmem_alltoallsmem_bw, NULL, NULL, false}, // done 3
+    {"shmem_alltoalls", "bw", bench_shmem_alltoalls_bw, NULL, NULL, false},
+    {"shmem_alltoallsmem", "bw", bench_shmem_alltoallsmem_bw, NULL, NULL, false},
 
-    {"shmem_broadcast", "bw", bench_shmem_broadcast_bw, NULL, NULL, false}, // done 3
-    {"shmem_broadcastmem", "bw", bench_shmem_broadcastmem_bw, NULL, NULL, false}, // done 3
+    {"shmem_broadcast", "bw", bench_shmem_broadcast_bw, NULL, NULL, false}, 
+    {"shmem_broadcastmem", "bw", bench_shmem_broadcastmem_bw, NULL, NULL, false}, 
 
-    {"shmem_collect", "bw", bench_shmem_collect_bw, NULL, NULL, false}, // done 3
-    {"shmem_collectmem", "bw", bench_shmem_collectmem_bw, NULL, NULL, false}, // done 3
+    {"shmem_collect", "bw", bench_shmem_collect_bw, NULL, NULL, false}, 
+    {"shmem_collectmem", "bw", bench_shmem_collectmem_bw, NULL, NULL, false}, 
 
-    {"shmem_fcollect", "bw", bench_shmem_fcollect_bw, NULL, NULL, false}, // done 3
-    {"shmem_fcollectmem", "bw", bench_shmem_fcollectmem_bw, NULL, NULL, false}, // done 3
+    {"shmem_fcollect", "bw", bench_shmem_fcollect_bw, NULL, NULL, false},
+    {"shmem_fcollectmem", "bw", bench_shmem_fcollectmem_bw, NULL, NULL, false},
 
     {"shmem_barrier_all", "latency", NULL, NULL,
      bench_shmem_barrier_all_latency, false},
 
     {"shmem_atomic_add", "latency", NULL, NULL, bench_shmem_atomic_add_latency,
-     false},
+     false}, 
     {"shmem_atomic_compare_swap", "latency", NULL, NULL,
-     bench_shmem_atomic_compare_swap_latency, false},
+     bench_shmem_atomic_compare_swap_latency, false}, 
     {"shmem_atomic_fetch_nbi", "latency", NULL, NULL,
-     bench_shmem_atomic_fetch_nbi_latency, false},
+     bench_shmem_atomic_fetch_nbi_latency, false}, 
     {"shmem_atomic_fetch", "latency", NULL, NULL,
-     bench_shmem_atomic_fetch_latency, false},
+     bench_shmem_atomic_fetch_latency, false}, 
     {"shmem_atomic_inc", "latency", NULL, NULL, bench_shmem_atomic_inc_latency,
-     false},
+     false}, 
     {"shmem_atomic_set", "latency", NULL, NULL, bench_shmem_atomic_set_latency,
-     false},
+     false}, 
     {"shmem_atomic_swap", "latency", NULL, NULL,
-     bench_shmem_atomic_swap_latency, false}};
+     bench_shmem_atomic_swap_latency, false}}; 
 
 /**
   @brief Run the selected benchmark

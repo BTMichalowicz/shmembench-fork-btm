@@ -26,11 +26,15 @@ typedef struct {
   int min_msg_size;
   int max_msg_size;
   int ntimes;
+  int warmups;
   int stride;
 
   /* Option to print help */
   bool help;
 } options;
+
+/* Define default number of warmup iterations */
+#define DEFAULT_WARMUP_ITERATIONS 20
 
 /**
   @brief Parses runtime options
@@ -45,9 +49,7 @@ typedef struct {
   @param stride Stride value to use for the benchmark (only used if applicable)
   @return True if parsing is successful, false otherwise.
  */
-bool parse_opts(int argc, char *argv[], options *opts, char **benchmark,
-                char **benchtype, int *min_msg_size, int *max_msg_size,
-                int *ntimes, int *stride);
+bool parse_opts(int argc, char *argv[], options *opts);
 
 /**
   @brief Displays usage information.

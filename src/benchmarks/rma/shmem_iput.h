@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "shmembench.h"
+#include "parse_opts.h"
 
 /**
   @brief Run the bandwidth benchmark for shmem_iput
@@ -21,8 +22,7 @@
   @param ntimes Number of repetitions to get the avgs from
   @param stride Stride for shmem_iput
  */
-void bench_shmem_iput_bw(int min_msg_size, int max_msg_size, int ntimes,
-                         int stride);
+void bench_shmem_iput_bw(options * opts);
 
 /**
   @brief Run the bidirectional bandwidth benchmark for shmem_iput
@@ -31,7 +31,6 @@ void bench_shmem_iput_bw(int min_msg_size, int max_msg_size, int ntimes,
   @param ntimes Number of repetitions to get the avgs from
   @param stride Stride for shmem_iput
  */
-void bench_shmem_iput_bibw(int min_msg_size, int max_msg_size, int ntimes,
-                           int stride);
+void bench_shmem_iput_bibw(options * opts);
 
 #endif /* SHMEM_IPUT_H */

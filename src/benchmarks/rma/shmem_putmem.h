@@ -13,19 +13,20 @@
 #include <string.h>
 
 #include "shmembench.h"
+#include "parse_opts.h"
 
 /**
   @brief Run the bandwidth benchmark for shmem_putmem
   @param min_msg_size Minimum message size for test in bytes
   @param max_msg_size Maximum message size for test in bytes
  */
-void bench_shmem_putmem_bw(int min_msg_size, int max_msg_size, int ntimes);
+void bench_shmem_putmem_bw(options * opts);
 
 /**
   @brief Run the bidirectional bandwidth benchmark for shmem_putmem
   @param min_msg_size Minimum message size for test in bytes
   @param max_msg_size Maximum message size for test in bytes
  */
-void bench_shmem_putmem_bibw(int min_msg_size, int max_msg_size, int ntimes);
+void bench_shmem_putmem_bibw(options * opts);
 
 #endif /* SHMEM_PUTMEM_H */

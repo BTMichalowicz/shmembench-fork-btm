@@ -8,11 +8,9 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_alltoallsmem
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of times the benchmark should run
+  @param opts Benchmarks options given by the user 
  */
-void bench_shmem_alltoallsmem_bw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_alltoallsmem_bw(options * opts) {
   /* Ensure there are at least 2 PEs available to run the benchmark */
   if (!check_if_atleast_2_pes()) {
     return;
@@ -24,7 +22,7 @@ void bench_shmem_alltoallsmem_bw(int min_msg_size, int max_msg_size, int ntimes)
   int num_sizes = 0;
 
   /* Setup the benchmark */
-  setup_bench(min_msg_size, max_msg_size, &num_sizes, &msg_sizes, &times,
+  setup_bench(opts->min_msg_size, opts->max_msg_size, &num_sizes, &msg_sizes, &times,
               &bandwidths);
 
   /* Get the number of processing elements (PEs) and PE number */
@@ -32,13 +30,13 @@ void bench_shmem_alltoallsmem_bw(int min_msg_size, int max_msg_size, int ntimes)
   int mype = shmem_my_pe();
 
   /* Run through the benchmark */
-  for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
+  for (int i = 0, size = opts->min_msg_size; size <= opts->max_msg_size; size *= 2, i++) {
     /* Save message size */
     msg_sizes[i] = size;
 
     /* Allocate memory for source and destination arrays */
-    unsigned char *source = (unsigned char *)shmem_malloc(size * npes);
-    unsigned char *dest = (unsigned char *)shmem_malloc(size * npes);
+    unsigned char *source = (unsigned char *)shmem_malloc(size * npes * opts->stride);
+    unsigned char *dest = (unsigned char *)shmem_malloc(size * npes * opts->stride);
 
     /* Initialize the source buffer with data */
     for (int j = 0; j < size * npes; j++) {
@@ -51,13 +49,22 @@ void bench_shmem_alltoallsmem_bw(int min_msg_size, int max_msg_size, int ntimes)
     /* Sync PEs */
     shmem_barrier_all();
 
+    /* Do warmup runs */
+    for (int j = 0; j < opts->warmups; j++) {
+#if defined(USE_15)
+      shmem_alltoallsmem(SHMEM_TEAM_WORLD, dest, source, opts->stride, opts->stride, size);
+#endif
+    }
+
+    shmem_barrier_all();
+
     /* Start timer */
     start_time = mysecond();
 
     /* Perform NTIMES shmem_alltoallsmem operations */
-    for (int j = 0; j < ntimes; j++) {
+    for (int j = 0; j < opts->ntimes; j++) {
 #if defined(USE_15)
-      shmem_alltoallsmem(SHMEM_TEAM_WORLD, dest, source, 1, size, size);
+      shmem_alltoallsmem(SHMEM_TEAM_WORLD, dest, source, opts->stride, opts->stride, size);
 #endif
     }
     shmem_quiet();
@@ -66,7 +73,7 @@ void bench_shmem_alltoallsmem_bw(int min_msg_size, int max_msg_size, int ntimes)
     end_time = mysecond();
 
     /* Calculate the average time per operation in useconds */
-    times[i] = (end_time - start_time) * 1e6 / ntimes;
+    times[i] = (end_time - start_time) * 1e6 / opts->ntimes;
 
     /* Calculate bandwidth */
     bandwidths[i] = calculate_bw(size * npes, times[i]);

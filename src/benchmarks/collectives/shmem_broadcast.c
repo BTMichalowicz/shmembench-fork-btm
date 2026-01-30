@@ -8,11 +8,9 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_broadcast
-  @param min_msg_size Minimum message size for the test in bytes
-  @param max_msg_size Maximum message size for the test in bytes
-  @param ntimes Number of times to run the benchmark
+  @param opts Benchmarks options given by the user 
  */
-void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_broadcast_bw(options * opts) {
   /* Ensure there are at least 2 PEs available to run the benchmark */
   if (!check_if_atleast_2_pes()) {
     return;
@@ -24,7 +22,7 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
   int num_sizes = 0;
 
   /* Setup benchmark */
-  setup_bench(min_msg_size, max_msg_size, &num_sizes, &msg_sizes, &times,
+  setup_bench(opts->min_msg_size, opts->max_msg_size, &num_sizes, &msg_sizes, &times,
               &bandwidths);
 
 #if defined(USE_14)
@@ -40,7 +38,7 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
 #endif
 
   /* Run the benchmark */
-  for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
+  for (int i = 0, size = opts->min_msg_size; size <= opts->max_msg_size; size *= 2, i++) {
     /* Validate the message size for the long datatype */
     int valid_size = validate_typed_size(size, sizeof(long), "long");
     msg_sizes[i] = valid_size;
@@ -62,12 +60,23 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Sync PEs */
     shmem_barrier_all();
 
+    /* Do warmup runs */
+    for (int j = 0; j < opts->warmups; j++) {
+#if defined(USE_14)
+      shmem_broadcast64(dest, source, elem_count, 0, 0, 0, npes, pSync);
+#elif defined(USE_15)
+      shmem_broadcast(SHMEM_TEAM_WORLD, dest, source, elem_count, 0);
+#endif
+    }
+
+    shmem_barrier_all();
+
     /* Start timer */
     start_time = mysecond();
 
     /* Perform the shmem_broadcast operation for the specified number of times
      */
-    for (int j = 0; j < ntimes; j++) {
+    for (int j = 0; j < opts->ntimes; j++) {
 #if defined(USE_14)
       shmem_broadcast64(dest, source, elem_count, 0, 0, 0, npes, pSync);
 #elif defined(USE_15)
@@ -80,7 +89,7 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
     end_time = mysecond();
 
     /* Calculate average time per operation in useconds */
-    times[i] = (end_time - start_time) * 1e6 / ntimes;
+    times[i] = (end_time - start_time) * 1e6 / opts->ntimes;
       
     /* Calculate bandwidth */
     bandwidths[i] = calculate_bw(valid_size, times[i]);

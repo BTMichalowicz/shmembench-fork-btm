@@ -8,11 +8,9 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_alltoallmem
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of iterations for the benchmark
+  @param opts Benchmarks options given by the user 
  */
-void bench_shmem_alltoallmem_bw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_alltoallmem_bw(options * opts) {
   /* Check the number of PEs before doing anything */
   if (!check_if_atleast_2_pes()) {
     return;
@@ -24,7 +22,7 @@ void bench_shmem_alltoallmem_bw(int min_msg_size, int max_msg_size, int ntimes) 
   int num_sizes = 0;
 
   /* Setup the benchmark */
-  setup_bench(min_msg_size, max_msg_size, &num_sizes, &msg_sizes, &times,
+  setup_bench(opts->min_msg_size, opts->max_msg_size, &num_sizes, &msg_sizes, &times,
               &bandwidths);
 
   /* Get the number of PEs and PE number */
@@ -32,7 +30,7 @@ void bench_shmem_alltoallmem_bw(int min_msg_size, int max_msg_size, int ntimes) 
   int mype = shmem_my_pe();
 
   /* Run the benchmark */
-  for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
+  for (int i = 0, size = opts->min_msg_size; size <= opts->max_msg_size; size *= 2, i++) {
     /* Save message size */
     msg_sizes[i] = size;
 
@@ -51,11 +49,20 @@ void bench_shmem_alltoallmem_bw(int min_msg_size, int max_msg_size, int ntimes) 
     /* Sync PEs */
     shmem_barrier_all();
 
+    /* Do warmup runs */
+    for (int j = 0; j < opts->warmups; j++) {
+#if defined(USE_15)
+      shmem_alltoallmem(SHMEM_TEAM_WORLD, dest, source, size);
+#endif
+    }
+
+    shmem_barrier_all();
+
     /* Start timer */
     start_time = mysecond();
 
     /* Perform NTIMES shmem_alltoall operations */
-    for (int j = 0; j < ntimes; j++) {
+    for (int j = 0; j < opts->ntimes; j++) {
 #if defined(USE_15)
       shmem_alltoallmem(SHMEM_TEAM_WORLD, dest, source, size);
 #endif
@@ -66,7 +73,7 @@ void bench_shmem_alltoallmem_bw(int min_msg_size, int max_msg_size, int ntimes) 
     end_time = mysecond();
 
     /* Calculate average time per operation in useconds */
-    times[i] = (end_time - start_time) * 1e6 / ntimes;
+    times[i] = (end_time - start_time) * 1e6 / opts->ntimes;
 
     /* Calculate bandwidth */
     bandwidths[i] = calculate_bw(size * npes, times[i]);

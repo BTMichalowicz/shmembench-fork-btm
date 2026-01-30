@@ -15,6 +15,7 @@
 #include <sys/time.h>
 
 #include "benchmarks.h"
+#include "parse_opts.h"
 
 /* ANSI color codes for pretty output */
 #define RESET_COLOR "\033[0m"
@@ -53,8 +54,7 @@ int calculate_elem_count(int byte_size, size_t type_size);
   @param stride Stride value to use for the benchmark (only applicable to
   certain benchmarks)
  */
-void run_benchmark(char *benchmark, char *benchtype, int min_msg_size,
-                   int max_msg_size, int ntimes, int stride);
+void run_benchmark(options * opts);
 
 /**
   @brief Calculate bandwidth based on message size and time

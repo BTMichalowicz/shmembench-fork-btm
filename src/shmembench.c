@@ -4,18 +4,17 @@
  */
 
 #include "shmembench.h"
+#include "parse_opts.h"
 
 /* Function pointer type for benchmarks without stride */
-typedef void (*benchmark_func_t)(int min_msg_size, int max_msg_size,
-                                 int ntimes);
+typedef void (*benchmark_func_t)(options *opts);
 
 /* Function pointer type for benchmarks with stride */
-typedef void (*benchmark_func_with_stride_t)(int min_msg_size, int max_msg_size,
-                                             int ntimes, int stride);
+typedef void (*benchmark_func_with_stride_t)(options * opts);
 
 /* Function pointer type for benchmarks without message size parameters (like
  * barriers and atomics) */
-typedef void (*benchmark_func_no_size_t)(int ntimes);
+typedef void (*benchmark_func_no_size_t)(options * opts);
 
 /* Mapping of benchmarks and their types to functions */
 typedef struct {
@@ -30,49 +29,49 @@ typedef struct {
 /* Dispatch table for benchmarks */
 benchmark_entry_t benchmark_table[] = {
     {"shmem_put", "bw", bench_shmem_put_bw, NULL, NULL, false},
-    {"shmem_put", "bibw", bench_shmem_put_bibw, NULL, NULL, false},
+    {"shmem_put", "bibw", bench_shmem_put_bibw, NULL, NULL, false}, // done
 
     {"shmem_get", "bw", bench_shmem_get_bw, NULL, NULL, false},
-    {"shmem_get", "bibw", bench_shmem_get_bibw, NULL, NULL, false},
+    {"shmem_get", "bibw", bench_shmem_get_bibw, NULL, NULL, false}, // done
 
     {"shmem_putmem", "bw", bench_shmem_putmem_bw, NULL, NULL, false},
-    {"shmem_putmem", "bibw", bench_shmem_putmem_bibw, NULL, NULL, false},
+    {"shmem_putmem", "bibw", bench_shmem_putmem_bibw, NULL, NULL, false}, // done
 
     {"shmem_getmem", "bw", bench_shmem_getmem_bw, NULL, NULL, false},
-    {"shmem_getmem", "bibw", bench_shmem_getmem_bibw, NULL, NULL, false},
+    {"shmem_getmem", "bibw", bench_shmem_getmem_bibw, NULL, NULL, false}, // done
 
     {"shmem_iput", "bw", NULL, bench_shmem_iput_bw, NULL, true},
-    {"shmem_iput", "bibw", NULL, bench_shmem_iput_bibw, NULL, true},
-
+    {"shmem_iput", "bibw", NULL, bench_shmem_iput_bibw, NULL, true}, // done
+ 
     {"shmem_iget", "bw", NULL, bench_shmem_iget_bw, NULL, true},
-    {"shmem_iget", "bibw", NULL, bench_shmem_iget_bibw, NULL, true},
+    {"shmem_iget", "bibw", NULL, bench_shmem_iget_bibw, NULL, true}, // done 2
 
     {"shmem_put_nbi", "bw", bench_shmem_put_nbi_bw, NULL, NULL, false},
-    {"shmem_put_nbi", "bibw", bench_shmem_put_nbi_bibw, NULL, NULL, false},
+    {"shmem_put_nbi", "bibw", bench_shmem_put_nbi_bibw, NULL, NULL, false}, // done 2
 
     {"shmem_get_nbi", "bw", bench_shmem_get_nbi_bw, NULL, NULL, false},
-    {"shmem_get_nbi", "bibw", bench_shmem_get_nbi_bibw, NULL, NULL, false},
+    {"shmem_get_nbi", "bibw", bench_shmem_get_nbi_bibw, NULL, NULL, false}, //done 2
 
     {"shmem_putmem_nbi", "bw", bench_shmem_putmem_nbi_bw, NULL, NULL, false},
-    {"shmem_putmem_nbi", "bibw", bench_shmem_putmem_nbi_bibw, NULL, NULL, false},
+    {"shmem_putmem_nbi", "bibw", bench_shmem_putmem_nbi_bibw, NULL, NULL, false}, // done 2
 
     {"shmem_getmem_nbi", "bw", bench_shmem_getmem_nbi_bw, NULL, NULL, false},
-    {"shmem_getmem_nbi", "bibw", bench_shmem_getmem_nbi_bibw, NULL, NULL, false},
+    {"shmem_getmem_nbi", "bibw", bench_shmem_getmem_nbi_bibw, NULL, NULL, false}, // done
 
-    {"shmem_alltoall", "bw", bench_shmem_alltoall_bw, NULL, NULL, false},
-    {"shmem_alltoallmem", "bw", bench_shmem_alltoallmem_bw, NULL, NULL, false},
+    {"shmem_alltoall", "bw", bench_shmem_alltoall_bw, NULL, NULL, false}, // done 3
+    {"shmem_alltoallmem", "bw", bench_shmem_alltoallmem_bw, NULL, NULL, false}, // done 3
 
-    {"shmem_alltoalls", "bw", bench_shmem_alltoalls_bw, NULL, NULL, false},
-    {"shmem_alltoallsmem", "bw", bench_shmem_alltoallsmem_bw, NULL, NULL, false},
+    {"shmem_alltoalls", "bw", bench_shmem_alltoalls_bw, NULL, NULL, false}, // done 3
+    {"shmem_alltoallsmem", "bw", bench_shmem_alltoallsmem_bw, NULL, NULL, false}, // done 3
 
-    {"shmem_broadcast", "bw", bench_shmem_broadcast_bw, NULL, NULL, false},
-    {"shmem_broadcastmem", "bw", bench_shmem_broadcastmem_bw, NULL, NULL, false},
+    {"shmem_broadcast", "bw", bench_shmem_broadcast_bw, NULL, NULL, false}, // done 3
+    {"shmem_broadcastmem", "bw", bench_shmem_broadcastmem_bw, NULL, NULL, false}, // done 3
 
-    {"shmem_collect", "bw", bench_shmem_collect_bw, NULL, NULL, false},
-    {"shmem_collectmem", "bw", bench_shmem_collectmem_bw, NULL, NULL, false},
+    {"shmem_collect", "bw", bench_shmem_collect_bw, NULL, NULL, false}, // done 3
+    {"shmem_collectmem", "bw", bench_shmem_collectmem_bw, NULL, NULL, false}, // done 3
 
-    {"shmem_fcollect", "bw", bench_shmem_fcollect_bw, NULL, NULL, false},
-    {"shmem_fcollectmem", "bw", bench_shmem_fcollectmem_bw, NULL, NULL, false},
+    {"shmem_fcollect", "bw", bench_shmem_fcollect_bw, NULL, NULL, false}, // done 3
+    {"shmem_fcollectmem", "bw", bench_shmem_fcollectmem_bw, NULL, NULL, false}, // done 3
 
     {"shmem_barrier_all", "latency", NULL, NULL,
      bench_shmem_barrier_all_latency, false},
@@ -102,19 +101,17 @@ benchmark_entry_t benchmark_table[] = {
   @param ntimes Number of times the benchmark should run
   @param stride Stride value to use for the benchmark (only used if applicable)
  */
-void run_benchmark(char *benchmark, char *benchtype, int min_msg_size,
-                   int max_msg_size, int ntimes, int stride) {
+void run_benchmark(options * opts) {
   for (int i = 0; i < sizeof(benchmark_table) / sizeof(benchmark_entry_t);
        i++) {
-    if (strcmp(benchmark, benchmark_table[i].benchmark) == 0 &&
-        strcmp(benchtype, benchmark_table[i].benchtype) == 0) {
+    if (strcmp(opts->bench, benchmark_table[i].benchmark) == 0 &&
+        strcmp(opts->benchtype, benchmark_table[i].benchtype) == 0) {
       if (benchmark_table[i].uses_stride) {
-        benchmark_table[i].func_with_stride(min_msg_size, max_msg_size, ntimes,
-                                            stride);
+        benchmark_table[i].func_with_stride(opts);
       } else if (benchmark_table[i].func != NULL) {
-        benchmark_table[i].func(min_msg_size, max_msg_size, ntimes);
+        benchmark_table[i].func(opts);
       } else if (benchmark_table[i].func_no_size != NULL) {
-        benchmark_table[i].func_no_size(ntimes);
+        benchmark_table[i].func_no_size(opts);
       }
       return;
     }

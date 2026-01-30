@@ -1,7 +1,5 @@
 /**
-  @file parse_opts.c
-  @details Parse the runtime options from the command line
-  @author Michael Beebe (Texas Tech University)
+  @file parse_opts.c @details Parse the runtime options from the command line @author Michael Beebe (Texas Tech University)
  */
 
 #include "parse_opts.h"
@@ -19,17 +17,23 @@
   @param stride Stride value to use for the benchmark (only used if applicable)
   @return True if parsing is successful, false otherwise.
  */
-bool parse_opts(int argc, char *argv[], options *opts, char **benchmark,
-                char **benchtype, int *min_msg_size, int *max_msg_size,
-                int *ntimes, int *stride) {
+bool parse_opts(int argc, char *argv[], options *opts) {
   /* Initialize all options to default values */
   memset(opts, 0, sizeof(*opts));
 
+  /* Set default value for Warmup Rounds */
+
+  opts->warmups = DEFAULT_WARMUP_ITERATIONS;
+
   /* Set default values for min_msg_size, max_msg_size, ntimes, and stride */
-  *min_msg_size = 8;
-  *max_msg_size = 1024;
-  *ntimes = 10;
-  *stride = 10;
+  opts->min_msg_size = 8;
+  opts->max_msg_size = 1024;
+  opts->ntimes = 10;
+  opts->stride = 10;
+
+  /* Set bench and benchtype to NULL */
+  opts->bench = NULL;
+  opts->benchtype = NULL;
 
   /* Define runtime options */
   static struct option long_options[] = {
@@ -38,6 +42,7 @@ bool parse_opts(int argc, char *argv[], options *opts, char **benchmark,
       {"min", required_argument, 0, 0},
       {"max", required_argument, 0, 0},
       {"ntimes", required_argument, 0, 0},
+      {"warmup", required_argument, 0, 0},
       {"stride", required_argument, 0, 0},
       {"help", no_argument, 0, 0},
       {0, 0, 0, 0} /* Terminator */
@@ -54,12 +59,10 @@ bool parse_opts(int argc, char *argv[], options *opts, char **benchmark,
 
       if (strcmp(option_name, "bench") == 0) {
         opts->bench = strdup(optarg);
-        *benchmark = opts->bench;
       } else if (strcmp(option_name, "benchtype") == 0) {
         if (strcmp(optarg, "bw") == 0 || strcmp(optarg, "bibw") == 0 ||
             strcmp(optarg, "latency") == 0) {
           opts->benchtype = strdup(optarg);
-          *benchtype = opts->benchtype;
         } else {
           if (shmem_my_pe() == 0) {
             fprintf(stderr,
@@ -70,37 +73,38 @@ bool parse_opts(int argc, char *argv[], options *opts, char **benchmark,
           return false;
         }
       } else if (strcmp(option_name, "min") == 0) {
-        if (*benchmark && (strcmp(*benchmark, "shmem_barrier_all") != 0)) {
+        if (opts->bench && (strcmp(opts->bench, "shmem_barrier_all") != 0)) {
           opts->min_msg_size = atoi(optarg);
           if (opts->min_msg_size <= 0) {
             opts->min_msg_size = 1; /* Set a default if not provided */
           }
-          *min_msg_size = opts->min_msg_size;
         }
       } else if (strcmp(option_name, "max") == 0) {
-        if (*benchmark && (strcmp(*benchmark, "shmem_barrier_all") != 0)) {
+        if (opts->bench && (strcmp(opts->bench, "shmem_barrier_all") != 0)) {
           opts->max_msg_size = atoi(optarg);
           if (opts->max_msg_size <= 0 ||
               opts->max_msg_size < opts->min_msg_size) {
             opts->max_msg_size =
-                *min_msg_size * 128; /* Set a default max if invalid */
+                opts->min_msg_size * 128; /* Set a default max if invalid */
           }
-          *max_msg_size = opts->max_msg_size;
         }
       } else if (strcmp(option_name, "ntimes") == 0) {
         opts->ntimes = atoi(optarg);
         if (opts->ntimes <= 0) {
           opts->ntimes = 10; /* Default to 10 if not provided */
         }
-        *ntimes = opts->ntimes;
+      } else if (strcmp(option_name, "warmups") == 0) {
+        opts->warmups = atoi(optarg);
+        if (opts->warmups < 0){
+          opts->warmups = DEFAULT_WARMUP_ITERATIONS;
+        }
       } else if (strcmp(option_name, "stride") == 0) {
-        if (*benchmark && (strcmp(*benchmark, "shmem_iput") == 0 ||
-                           strcmp(*benchmark, "shmem_iget") == 0)) {
+        if (opts->bench && (strcmp(opts->bench, "shmem_iput") == 0 ||
+                           strcmp(opts->bench, "shmem_iget") == 0)) {
           opts->stride = atoi(optarg);
           if (opts->stride <= 0) {
             opts->stride = 10; /* Default to 10 if not provided */
           }
-          *stride = opts->stride;
         }
       } else if (strcmp(option_name, "help") == 0) {
         opts->help = true;
@@ -112,46 +116,45 @@ bool parse_opts(int argc, char *argv[], options *opts, char **benchmark,
     }
   }
 
-  /* Set default benchtype if not provided by user */
-  if (*benchtype == NULL || strlen(*benchtype) == 0) {
-    if (*benchmark != NULL) {
-      /* Atomics: default to latency */
-      if (strstr(*benchmark, "atomic") != NULL) {
-        opts->benchtype = strdup("latency");
-        *benchtype = opts->benchtype;
-      }
-      /* Barrier: default to latency */
-      else if (strcmp(*benchmark, "shmem_barrier_all") == 0) {
-        opts->benchtype = strdup("latency");
-        *benchtype = opts->benchtype;
-      }
-      /* Collectives and pt2pt RMA: default to bw */
-      else if (strcmp(*benchmark, "shmem_put") == 0 ||
-               strcmp(*benchmark, "shmem_putmem") == 0 ||
-               strcmp(*benchmark, "shmem_iput") == 0 ||
-               strcmp(*benchmark, "shmem_get") == 0 ||
-               strcmp(*benchmark, "shmem_getmem") == 0 ||
-               strcmp(*benchmark, "shmem_iget") == 0 ||
-               strcmp(*benchmark, "shmem_put_nbi") == 0 ||
-               strcmp(*benchmark, "shmem_putmem_nbi") == 0 ||
-               strcmp(*benchmark, "shmem_get_nbi") == 0 ||
-               strcmp(*benchmark, "shmem_getmem_nbi") == 0 ||
-               strcmp(*benchmark, "shmem_alltoall") == 0 ||
-               strcmp(*benchmark, "shmem_alltoallmem") == 0 ||
-               strcmp(*benchmark, "shmem_alltoalls") == 0 ||
-               strcmp(*benchmark, "shmem_alltoallsmem") == 0 ||
-               strcmp(*benchmark, "shmem_broadcast") == 0 ||
-               strcmp(*benchmark, "shmem_broadcastmem") == 0 ||
-               strcmp(*benchmark, "shmem_collectmem") == 0 ||
-               strcmp(*benchmark, "shmem_collect") == 0 ||
-               strcmp(*benchmark, "shmem_fcollect") == 0 ||
-               strcmp(*benchmark, "shmem_fcollectmem") == 0) {
-        opts->benchtype = strdup("bw");
-        *benchtype = opts->benchtype;
-      }
-    }
+  /* return false if benchmark not specified */
+  if (opts->bench == NULL){
+    return false;
   }
 
+  /* Set default benchtype if not provided by user */
+  if (opts->benchtype == NULL || strlen(opts->bench) == 0) {
+    /* Atomics: default to latency */
+    if (strstr(opts->bench, "atomic") != NULL) {
+      opts->benchtype = strdup("latency");
+    }
+    /* Barrier: default to latency */
+    else if (strcmp(opts->bench, "shmem_barrier_all") == 0) {
+      opts->benchtype = strdup("latency");
+    }
+    /* Collectives and pt2pt RMA: default to bw */
+    else if (strcmp(opts->bench, "shmem_put") == 0 ||
+             strcmp(opts->bench, "shmem_putmem") == 0 ||
+             strcmp(opts->bench, "shmem_iput") == 0 ||
+             strcmp(opts->bench, "shmem_get") == 0 ||
+             strcmp(opts->bench, "shmem_getmem") == 0 ||
+             strcmp(opts->bench, "shmem_iget") == 0 ||
+             strcmp(opts->bench, "shmem_put_nbi") == 0 ||
+             strcmp(opts->bench, "shmem_putmem_nbi") == 0 ||
+             strcmp(opts->bench, "shmem_get_nbi") == 0 ||
+             strcmp(opts->bench, "shmem_getmem_nbi") == 0 ||
+             strcmp(opts->bench, "shmem_alltoall") == 0 ||
+             strcmp(opts->bench, "shmem_alltoallmem") == 0 ||
+             strcmp(opts->bench, "shmem_alltoalls") == 0 ||
+             strcmp(opts->bench, "shmem_alltoallsmem") == 0 ||
+             strcmp(opts->bench, "shmem_broadcast") == 0 ||
+             strcmp(opts->bench, "shmem_broadcastmem") == 0 ||
+             strcmp(opts->bench, "shmem_collectmem") == 0 ||
+             strcmp(opts->bench, "shmem_collect") == 0 ||
+             strcmp(opts->bench, "shmem_fcollect") == 0 ||
+             strcmp(opts->bench, "shmem_fcollectmem") == 0) {
+      opts->benchtype = strdup("bw");
+    }
+  }
   return true;
 }
 

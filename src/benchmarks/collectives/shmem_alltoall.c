@@ -8,7 +8,7 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_alltoall
-  @param opts Benchmark options given by the user 
+  @param opts Benchmarks options given by the user 
  */
 void bench_shmem_alltoall_bw(options * opts) {
   /* Check the number of PEs before doing anything */

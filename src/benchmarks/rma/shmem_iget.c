@@ -8,7 +8,7 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_iget
-  @param opts Benchmark options given by the user 
+  @param opts Benchmarks options given by the user 
  */
 void bench_shmem_iget_bw(options * opts) {
   /* Check the number of PEs before doing anything */
@@ -106,7 +106,11 @@ void bench_shmem_iget_bw(options * opts) {
 
 /*************************************************************
   @brief Run the bidirectional bandwidth benchmark for shmem_iget
+<<<<<<< HEAD
   @param opts Benchmark options given by the user 
+=======
+  @param opts Benchmarks options given by the user 
+>>>>>>> d9c44b5 (updated most benchmarks)
  *************************************************************/
 void bench_shmem_iget_bibw(options * opts) {
   /* Check the number of PEs before doing anything */
@@ -201,7 +205,11 @@ void bench_shmem_iget_bibw(options * opts) {
 
 /*************************************************************
   @brief Run the latency benchmark for shmem_iget
+<<<<<<< HEAD
   @param opts Benchmark options given by the user 
+=======
+  @param opts Benchmarks options given by the user 
+>>>>>>> d9c44b5 (updated most benchmarks)
  *************************************************************/
 void bench_shmem_iget_latency(options * opts) {
   /* Check the number of PEs before doing anything */

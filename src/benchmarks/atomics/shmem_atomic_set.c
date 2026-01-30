@@ -8,9 +8,9 @@
 
 /**
   @brief Run the latency benchmark for shmem_atomic_set
-  @param ntimes Number of iterations for the benchmark
+  @param opts Benchmarks options given by the user 
  */
-void bench_shmem_atomic_set_latency(int ntimes) {
+void bench_shmem_atomic_set_latency(options * opts) {
   /* Check the number of PEs before doing anything */
   if (!check_if_atleast_2_pes()) {
     return;
@@ -54,8 +54,18 @@ void bench_shmem_atomic_set_latency(int ntimes) {
   /* Sync PEs before starting benchmark */
   shmem_barrier_all();
 
-  /* Perform the shmem_atomic_set operation ntimes and measure latency */
-  for (int i = 0; i < ntimes; i++) {
+  /* Do warmup runs */
+  for (int i = 0; i < opts->warmups; i++) {
+    int pe = rand() % npes; 
+#if defined(USE_14) || defined(USE_15)
+    shmem_atomic_set(&dest[shmem_my_pe()], i, pe);
+#endif
+  }
+
+  shmem_barrier_all();
+
+  /* Perform the shmem_atomic_set operation opts->ntimes and measure latency */
+  for (int i = 0; i < opts->ntimes; i++) {
     int pe = rand() % npes; /* Randomly select a target PE */
     double start_time = mysecond();
 
@@ -80,7 +90,7 @@ void bench_shmem_atomic_set_latency(int ntimes) {
   /* Display results if on PE 0 */
   if (shmem_my_pe() == 0) {
     display_atomic_latency_results("shmem_atomic_set", *total_time / npes,
-                                   ntimes);
+                                   opts->ntimes);
   }
 
   /* Barrier for consistency and clean up memory */

@@ -41,12 +41,6 @@ typedef struct {
   @param argc Number of command-line arguments.
   @param argv Array of command-line argument strings.
   @param opts Reference to the test options structure.
-  @param benchmark Routine to be tested (e.g., shmem_put, shmem_get)
-  @param benchtype Type of benchmark to run (bw, bibw, or latency)
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of times the benchmark should run
-  @param stride Stride value to use for the benchmark (only used if applicable)
   @return True if parsing is successful, false otherwise.
  */
 bool parse_opts(int argc, char *argv[], options *opts);

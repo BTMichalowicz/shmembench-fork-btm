@@ -17,9 +17,7 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_alltoall
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of iterations for the benchmark
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_alltoall_bw(options * opts);
 

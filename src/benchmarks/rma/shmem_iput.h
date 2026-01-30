@@ -17,19 +17,13 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_iput
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of repetitions to get the avgs from
-  @param stride Stride for shmem_iput
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_iput_bw(options * opts);
 
 /**
   @brief Run the bidirectional bandwidth benchmark for shmem_iput
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of repetitions to get the avgs from
-  @param stride Stride for shmem_iput
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_iput_bibw(options * opts);
 

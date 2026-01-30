@@ -18,9 +18,7 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_collect
-  @param min_msg_size Minimum message size for the test in bytes
-  @param max_msg_size Maximum message size for the test in bytes
-  @param ntimes Number of times to run the benchmark
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_collect_bw(options * opts);
 

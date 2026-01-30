@@ -18,7 +18,7 @@
 
 /**
   @brief Run the latency benchmark for shmem_atomic_add
-  @param ntimes Number of iterations for the benchmark
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_atomic_add_latency(options * opts);
 

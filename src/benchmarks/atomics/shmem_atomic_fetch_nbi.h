@@ -18,7 +18,7 @@
 
 /**
   @brief Run the latency benchmark for shmem_atomic_fetch_nbi
-  @param ntimes Number of iterations for the benchmark
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_atomic_fetch_nbi_latency(options * opts);
 

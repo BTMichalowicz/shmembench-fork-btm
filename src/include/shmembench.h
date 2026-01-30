@@ -48,10 +48,7 @@ int calculate_elem_count(int byte_size, size_t type_size);
   @param benchmark The benchmark to be run (e.g., "shmem_put", "shmem_get")
   @param benchtype The type of benchmark to run, either "bw", "bibw", or
   "latency"
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of times the benchmark should run
-  @param stride Stride value to use for the benchmark (only applicable to
+  @param opts Benchmark options given by the user 
   certain benchmarks)
  */
 void run_benchmark(options * opts);

@@ -17,15 +17,13 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_putmem
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_putmem_bw(options * opts);
 
 /**
   @brief Run the bidirectional bandwidth benchmark for shmem_putmem
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_putmem_bibw(options * opts);
 

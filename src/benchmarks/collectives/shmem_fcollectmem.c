@@ -8,7 +8,7 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_fcollectmem
-  @param opts Benchmarks options given by the user 
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_fcollectmem_bw(options * opts) {
   /* Ensure there are at least 2 PEs available to run the benchmark */

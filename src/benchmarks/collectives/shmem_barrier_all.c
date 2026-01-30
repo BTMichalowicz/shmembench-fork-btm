@@ -7,7 +7,7 @@
 
 /**
   @brief Run the latency benchmark for shmem_barrier_all
-  @param opts Benchmarks options given by the user 
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_barrier_all_latency(options * opts) {
   if (!check_if_atleast_2_pes()) {

@@ -8,7 +8,7 @@
 
 /**
   @brief Run the latency benchmark for shmem_atomic_compare_swap
-  @param opts Benchmarks options given by the user 
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_atomic_compare_swap_latency(options * opts) {
   /* Check the number of PEs before doing anything */

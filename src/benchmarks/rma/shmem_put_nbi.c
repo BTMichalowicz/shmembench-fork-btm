@@ -7,7 +7,7 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_put_nbi
-  @param opts Benchmarks options given by the user 
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_put_nbi_bw(options * opts) {
   /* Check the number of PEs before doing anything */
@@ -107,7 +107,7 @@ void bench_shmem_put_nbi_bw(options * opts) {
 
 /**
   @brief Run the bidirectional bandwidth benchmark for shmem_put_nbi
-  @param opts Benchmarks options given by the user 
+  @param opts Benchmark options given by the user 
  */
 void bench_shmem_put_nbi_bibw(options * opts) {
   /* Check the number of PEs before doing anything */
@@ -204,7 +204,7 @@ void bench_shmem_put_nbi_bibw(options * opts) {
 
 /*************************************************************
   @brief Run the latency benchmark for shmem_put_nbi
-  @param opts Benchmarks options given by the user 
+  @param opts Benchmark options given by the user 
  *************************************************************/
 void bench_shmem_put_nbi_latency(options * opts) {
   /* Check the number of PEs before doing anything */

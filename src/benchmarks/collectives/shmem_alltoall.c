@@ -96,8 +96,8 @@ void bench_shmem_alltoall_bw(int min_msg_size, int max_msg_size, int ntimes) {
     bandwidths[i] = calculate_bw(valid_size * npes, times[i]);
 
     /* Free the buffers */
-   // shmem_free(source);
-   // shmem_free(dest);
+    shmem_free(source);
+    shmem_free(dest);
   }
 
   /* Display results */

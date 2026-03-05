@@ -1,5 +1,5 @@
 CC = oshcc
-CFLAGS = -std=gnu11 -Wall -I./src/include -O0 -g -fopenmp
+CFLAGS = -std=gnu11 -Wall -I./src/include -fopenmp -Wno-implicit-function-declaration -Wno-incompatible-pointer-types
 LDFLAGS =
 
 SRC_DIR = ./src

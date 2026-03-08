@@ -7,21 +7,18 @@
 #define _SHMEM_GET_H_
 
 #include "shmembench.h"
+#include "parse_opts.h"
 
 /**
   @brief Run the bandwidth benchmark for shmem_get
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of repetitions to get the avgs from
+  @param opts Benchmark options given by the user 
  */
-void bench_shmem_get_bw(int min_msg_size, int max_msg_size, int ntimes);
+void bench_shmem_get_bw(options * opts);
 
 /**
   @brief Run the bidirectional bandwidth benchmark for shmem_get
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of repetitions to get the avgs from
+  @param opts Benchmark options given by the user 
  */
-void bench_shmem_get_bibw(int min_msg_size, int max_msg_size, int ntimes);
+void bench_shmem_get_bibw(options * opts);
 
 #endif /* _SHMEM_GET_H_ */

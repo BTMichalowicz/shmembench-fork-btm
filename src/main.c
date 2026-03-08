@@ -60,12 +60,11 @@ int main(int argc, char *argv[]) {
     Parse options
   */
   options opts;
-  char *benchmark = (char *)malloc(100 * sizeof(char));
-  char *benchtype = (char *)malloc(100 * sizeof(char));
-  int min_msg_size, max_msg_size;
-  int ntimes, stride;
+  opts.bench = (char *)malloc(100 * sizeof(char));
+  opts.benchtype = (char *)malloc(100 * sizeof(char));
+  /* int min_msg_size, max_msg_size; */
+  /* int ntimes, stride; */
   shmem_barrier_all();
-
   if (argc == 1) {
     if (mype == 0) {
       display_help();
@@ -74,8 +73,7 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
   }
 
-  if (!parse_opts(argc, argv, &opts, &benchmark, &benchtype, &min_msg_size,
-                  &max_msg_size, &ntimes, &stride)) {
+  if (!parse_opts(argc, argv, &opts)) {
     if (mype == 0) {
       display_help();
     }
@@ -99,24 +97,23 @@ int main(int argc, char *argv[]) {
   */
   shmem_barrier_all();
   if (mype == 0) {
-    display_header(name, version, npes, benchmark, benchtype, min_msg_size,
-                   max_msg_size, ntimes, stride);
+    display_header(name, version, npes, opts.bench, opts.benchtype, opts.min_msg_size,
+                   opts.max_msg_size, opts.ntimes, opts.stride);
   }
 
   /**
     Run benchmarks
   */
   shmem_barrier_all();
-  run_benchmark(benchmark, benchtype, min_msg_size, max_msg_size, ntimes,
-                stride);
+  run_benchmark(&opts);
 
   /**
     Finalize the program
   */
   free(version);
   free(name);
-  free(benchmark);
-  free(benchtype);
+  free(opts.bench);
+  free(opts.benchtype);
 
   shmem_finalize();
   return EXIT_SUCCESS;

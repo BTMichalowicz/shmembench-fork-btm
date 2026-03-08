@@ -14,11 +14,12 @@
 #include <string.h>
 
 #include "shmembench.h"
+#include "parse_opts.h"
 
 /**
   @brief Run the latency benchmark for shmem_atomic_set
-  @param ntimes Number of iterations for the benchmark
+  @param opts Benchmark options given by the user 
  */
-void bench_shmem_atomic_set_latency(int ntimes);
+void bench_shmem_atomic_set_latency(options * opts);
 
 #endif /* SHMEM_ATOMIC_SET_H */

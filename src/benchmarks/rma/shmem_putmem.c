@@ -7,11 +7,9 @@
 
 /**
   @brief Run the bandwidth benchmark for shmem_putmem
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of repetitions to get the avgs from
+  @param opts Benchmark options given by the user 
  */
-void bench_shmem_putmem_bw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_putmem_bw(options * opts) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -25,11 +23,11 @@ void bench_shmem_putmem_bw(int min_msg_size, int max_msg_size, int ntimes) {
   int num_sizes = 0;
 
   /* Setup the benchmark */
-  setup_bench(min_msg_size, max_msg_size, &num_sizes, &msg_sizes, &times,
+  setup_bench(opts->min_msg_size, opts->max_msg_size, &num_sizes, &msg_sizes, &times,
               &bandwidths);
 
   /* Run the benchmark */
-  for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
+  for (int i = 0, size = opts->min_msg_size; size <= opts->max_msg_size; size *= 2, i++) {
     /* Save message size */
     msg_sizes[i] = size;
 
@@ -47,13 +45,25 @@ void bench_shmem_putmem_bw(int min_msg_size, int max_msg_size, int ntimes) {
 
     /* Sync PEs */
     shmem_barrier_all();
+    
+    /* Do warmup runs */
+    if (mype == 0) {
+      for (int j = 0; j < opts->warmups; j++) {
+#if defined(USE_14) || defined(USE_15)
+        shmem_putmem(dest, source, size, 1);
+        shmem_fence();
+#endif
+      }
+    }
+
+    shmem_barrier_all();
 
     /* Start timer */
     start_time = mysecond();
 
-    /* Perform ntimes shmem_puts */
+    /* Perform opts->ntimes shmem_puts */
     if (mype == 0) {
-      for (int j = 0; j < ntimes; j++) {
+      for (int j = 0; j < opts->ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
         shmem_putmem(dest, source, size, 1);
         shmem_fence();
@@ -66,7 +76,7 @@ void bench_shmem_putmem_bw(int min_msg_size, int max_msg_size, int ntimes) {
     end_time = mysecond();
 
     /* Calculate average time per operation in useconds */
-    times[i] = (end_time - start_time) * 1e6 / ntimes;
+    times[i] = (end_time - start_time) * 1e6 / opts->ntimes;
 
     /* Calculate bandwidth using valid size */
     bandwidths[i] = calculate_bw(size, times[i]);
@@ -94,11 +104,9 @@ void bench_shmem_putmem_bw(int min_msg_size, int max_msg_size, int ntimes) {
 
 /**
   @brief Run the bidirectional bandwidth benchmark for shmem_put
-  @param min_msg_size Minimum message size for test in bytes
-  @param max_msg_size Maximum message size for test in bytes
-  @param ntimes Number of repetitions to get the avgs from
+  @param opts Benchmark options given by the user 
  */
-void bench_shmem_putmem_bibw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_putmem_bibw(options * opts) {
   /* Check the number of PEs before doing anything */
   if (!check_if_exactly_2_pes()) {
     return;
@@ -113,11 +121,11 @@ void bench_shmem_putmem_bibw(int min_msg_size, int max_msg_size, int ntimes) {
   int num_sizes = 0;
 
   /* Setup the benchmark */
-  setup_bench(min_msg_size, max_msg_size, &num_sizes, &msg_sizes, &times,
+  setup_bench(opts->min_msg_size, opts->max_msg_size, &num_sizes, &msg_sizes, &times,
               &bandwidths);
 
   /* Run the benchmark */
-  for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
+  for (int i = 0, size = opts->min_msg_size; size <= opts->max_msg_size; size *= 2, i++) {
     /* Save message size */
     msg_sizes[i] = size;
 
@@ -136,11 +144,20 @@ void bench_shmem_putmem_bibw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Sync PEs */
     shmem_barrier_all();
 
+    for (int j = 0; j < opts->warmups; j++) {
+#if defined(USE_14) || defined(USE_15)
+      shmem_putmem(dest, source, size, peer); 
+      shmem_fence();
+#endif
+    }
+
+    shmem_barrier_all();
+
     /* Start timer */
     start_time = mysecond();
 
-    /* Perform ntimes bidirectional shmem_puts */
-    for (int j = 0; j < ntimes; j++) {
+    /* Perform opts->ntimes bidirectional shmem_puts */
+    for (int j = 0; j < opts->ntimes; j++) {
 #if defined(USE_14) || defined(USE_15)
       shmem_putmem(dest, source, size, peer); /* each PE sends to other PE */
       shmem_fence(); /* ensure ordering of puts */
@@ -152,7 +169,7 @@ void bench_shmem_putmem_bibw(int min_msg_size, int max_msg_size, int ntimes) {
     end_time = mysecond();
 
     /* Calculate average time per operation in useconds */
-    times[i] = (end_time - start_time) * 1e6 / (ntimes);
+    times[i] = (end_time - start_time) * 1e6 / (opts->ntimes);
 
     /* Calculate bidirectional bandwidth using valid size */
     bandwidths[i] = calculate_bibw(size, times[i]);

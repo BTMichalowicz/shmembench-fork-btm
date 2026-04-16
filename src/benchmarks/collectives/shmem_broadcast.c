@@ -87,7 +87,7 @@ void bench_shmem_broadcast_bw(int min_msg_size, int max_msg_size, int ntimes) {
     /* Calculate the average time per operation and bandwidth */
     times[i] = (end_time - start_time) * 1e6 / ntimes;
     bandwidths[i] = calculate_bw(valid_size, times[i]);
-
+    shmem_barrier_all();
     /* Free the allocated memory for source and destination arrays */
     shmem_free(source);
     shmem_free(dest);

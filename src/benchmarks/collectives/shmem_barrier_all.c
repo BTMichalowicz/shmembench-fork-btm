@@ -14,6 +14,9 @@ void bench_shmem_barrier_all_latency(options * opts) {
     return;
   }
 
+  char *exp = getenv("SHMEMBENCH_USE_EXPERIMENTAL");
+  int experimental = exp == NULL ? 0 : atoi(exp);
+
   double start_time, end_time, total_time;
   double avg_time;
 
@@ -21,17 +24,31 @@ void bench_shmem_barrier_all_latency(options * opts) {
   shmem_barrier_all();
 
   /* Do warmup runs */
-  for (int i = 0; i < opts->warmups; i++) {
-    shmem_barrier_all();
+  if (experimental){
+      for (int i = 0; i < opts->warmups; i++) {
+          shmemx_barrier_all();
+      }
+  }else{
+
+      for (int i = 0; i < opts->warmups; i++) {
+          shmem_barrier_all();
+      }
   }
 
   shmem_barrier_all();
 
   start_time = mysecond();
 
+  if (experimental){
   for (int i = 0; i < opts->ntimes; i++) {
-    shmem_barrier_all();
+      shmemx_barrier_all();
   }
+}else{
+
+  for (int i = 0; i < opts->ntimes; i++) {
+      shmem_barrier_all();
+  }
+}
 
   end_time = mysecond();
 

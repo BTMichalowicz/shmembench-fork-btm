@@ -34,7 +34,7 @@ typedef struct {
 } options;
 
 /* Define default number of warmup iterations */
-#define DEFAULT_WARMUP_ITERATIONS 20
+#define DEFAULT_WARMUP_ITERATIONS 100
 
 /**
   @brief Parses runtime options

@@ -58,7 +58,6 @@ benchmark_entry_t benchmark_table[] = {
     {"shmem_getmem_nbi", "bw", bench_shmem_getmem_nbi_bw, NULL, NULL, false},
     {"shmem_getmem_nbi", "bibw", bench_shmem_getmem_nbi_bibw, NULL, NULL, false}, 
 
-
     {"shmem_reduce", "bw", bench_shmem_reduce_bw, NULL, NULL, false},
 
     {"shmem_alltoall", "bw", bench_shmem_alltoall_bw, NULL, NULL, false},

@@ -13,7 +13,7 @@
   @param max_msg_size Maximum message size for the test in bytes
   @param ntimes Number of times to run the benchmark
  */
-void bench_shmem_reduce_bw(int min_msg_size, int max_msg_size, int ntimes) {
+void bench_shmem_reduce_bw(options *opts) {
   /* Ensure there are at least 2 PEs available to run the benchmark */
   if (!check_if_atleast_2_pes()) {
     return;
@@ -24,14 +24,14 @@ void bench_shmem_reduce_bw(int min_msg_size, int max_msg_size, int ntimes) {
   double *times, *bandwidths;
   int num_sizes = 0;
 
-  char *env = getenv("SHMEMBENCH_REDUCE_OP");
-//  if (env != NULL){
-//      fprintf(stdout, "Using the following op: %*s\n", 4, env);
-//  }
+  char *env = (getenv("SHMEMBENCH_REDUCE_OP") != NULL ? getenv("SHMEMBENCH_REDUCE_OP") : "sum");
+  //  if (env != NULL){
+  //      fprintf(stdout, "Using the following op: %*s\n", 4, env);
+  //  }
 
 
   /* Setup benchmark */
-  setup_bench(min_msg_size, max_msg_size, &num_sizes, &msg_sizes, &times,
+  setup_bench(opts->min_msg_size, opts->max_msg_size, &num_sizes, &msg_sizes, &times,
               &bandwidths);
 
 #if defined(USE_14)
@@ -44,7 +44,7 @@ void bench_shmem_reduce_bw(int min_msg_size, int max_msg_size, int ntimes) {
 #endif
 
   /* Run the benchmark */
-  for (int i = 0, size = min_msg_size; size <= max_msg_size; size *= 2, i++) {
+  for (int i = 0, size = opts->min_msg_size; size <= opts->max_msg_size; size *= 2, i++) {
     /* Validate the message size for the long datatype */
     int valid_size = validate_typed_size(size, sizeof(unsigned long), "unsigned long");
     msg_sizes[i] = valid_size;
@@ -70,18 +70,65 @@ void bench_shmem_reduce_bw(int min_msg_size, int max_msg_size, int ntimes) {
 //        fprintf(stdout, "\n");
 //    }
 
-
-
     double start_time, end_time;
 
     /* Sync PEs */
     shmem_barrier_all();
 
+    /* Do warmup runs */
+    for (int j = 0; j < opts->warmups; j++) {
+        if (env == NULL || strcmp(env, "sum") == 0){
+#if defined(USE_14)
+            shmem_ulong_sum_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+#elif defined(USE_15)
+            shmem_ulong_sum_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+#endif
+        }else if (strcmp(env, "prod") == 0){
+#if defined(USE_14)
+            shmem_ulong_prod_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+#elif defined(USE_15)
+            shmem_ulong_prod_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+#endif
+        }else if (strcmp(env, "max") == 0){
+#if defined(USE_14)
+            shmem_ulong_max_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+#elif defined(USE_15)
+            shmem_ulong_max_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+#endif
+        }else if (strcmp(env, "min") == 0){
+#if defined(USE_14)
+            shmem_ulong_min_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+#elif defined(USE_15)
+            shmem_ulong_min_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+#endif
+        }else if (strcmp(env, "and") == 0){
+#if defined(USE_14)
+            shmem_ulong_and_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+#elif defined(USE_15)
+            shmem_ulong_and_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+#endif
+        }else if (strcmp(env, "or") == 0){
+#if defined(USE_14)
+            shmem_ulong_or_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+#elif defined(USE_15)
+            shmem_ulong_or_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+#endif
+
+        }else if (strcmp(env, "xor") == 0){
+#if defined(USE_14)
+            shmem_ulong_xor_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+#elif defined(USE_15)
+            shmem_ulong_xor_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+#endif
+        }
+
+    }
+
     /* Start timer */
     start_time = mysecond();
 
     /* Perform the shmem_collect operation for the specified number of times */
-    for (int j = 0; j < ntimes; j++) {
+    for (int j = 0; j < opts->ntimes; j++) {
         memset(dest, 0, elem_count*sizeof(unsigned long));
 
         if (env == NULL || strcmp(env, "sum") == 0){
@@ -135,7 +182,7 @@ void bench_shmem_reduce_bw(int min_msg_size, int max_msg_size, int ntimes) {
     end_time = mysecond();
 
     /* Calculate average time per operation in useconds */
-    times[i] = (end_time - start_time) * 1e6 / ntimes;
+    times[i] = (end_time - start_time) * 1e6 / opts->ntimes;
 //    if (shmem_my_pe() == 0){
 //        fprintf(stdout, "Dest Buffer contents:\n");
 //        for (int j = 0; j < elem_count; j++){

@@ -46,15 +46,15 @@ void bench_shmem_reduce_bw(options *opts) {
   /* Run the benchmark */
   for (int i = 0, size = opts->min_msg_size; size <= opts->max_msg_size; size *= 2, i++) {
     /* Validate the message size for the long datatype */
-    int valid_size = validate_typed_size(size, sizeof(unsigned long), "unsigned long");
+    int valid_size = validate_typed_size(size, sizeof(int64_t), "int64_t");
     msg_sizes[i] = valid_size;
 
     /* Calculate the number of elements based on the validated size */
-    int elem_count = calculate_elem_count(valid_size, sizeof(unsigned long));
+    int elem_count = calculate_elem_count(valid_size, sizeof(int64_t));
 
     /* Allocate memory for source and destination arrays */
-    unsigned long *source = (unsigned long *)shmem_malloc(elem_count * sizeof(unsigned long));
-    unsigned long *dest = (unsigned long *)shmem_malloc(elem_count * sizeof(unsigned long));
+    int64_t *source = (int64_t *)shmem_malloc(elem_count * sizeof(int64_t));
+    int64_t *dest = (int64_t *)shmem_malloc(elem_count * sizeof(int64_t));
 
     /* Initialize the source buffer with data */
     for (int j = 0; j < elem_count; j++) {
@@ -79,46 +79,46 @@ void bench_shmem_reduce_bw(options *opts) {
     for (int j = 0; j < opts->warmups; j++) {
         if (env == NULL || strcmp(env, "sum") == 0){
 #if defined(USE_14)
-            shmem_ulong_sum_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_sum_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_sum_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_sum_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "prod") == 0){
 #if defined(USE_14)
-            shmem_ulong_prod_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_prod_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_prod_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_prod_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "max") == 0){
 #if defined(USE_14)
-            shmem_ulong_max_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_max_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_max_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_max_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "min") == 0){
 #if defined(USE_14)
-            shmem_ulong_min_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_min_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_min_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_min_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "and") == 0){
 #if defined(USE_14)
-            shmem_ulong_and_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_and_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_and_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_and_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "or") == 0){
 #if defined(USE_14)
-            shmem_ulong_or_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_or_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_or_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_or_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
 
         }else if (strcmp(env, "xor") == 0){
 #if defined(USE_14)
-            shmem_ulong_xor_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_xor_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_xor_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_xor_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }
 
@@ -133,46 +133,46 @@ void bench_shmem_reduce_bw(options *opts) {
 
         if (env == NULL || strcmp(env, "sum") == 0){
 #if defined(USE_14)
-            shmem_ulong_sum_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_sum_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_sum_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_sum_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "prod") == 0){
 #if defined(USE_14)
-            shmem_ulong_prod_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_prod_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_prod_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_prod_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "max") == 0){
 #if defined(USE_14)
-            shmem_ulong_max_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_max_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_max_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_max_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "min") == 0){
 #if defined(USE_14)
-            shmem_ulong_min_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_min_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_min_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_min_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "and") == 0){
 #if defined(USE_14)
-            shmem_ulong_and_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_and_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_and_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_and_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }else if (strcmp(env, "or") == 0){
 #if defined(USE_14)
-            shmem_ulong_or_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_or_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_or_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_or_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
 
         }else if (strcmp(env, "xor") == 0){
 #if defined(USE_14)
-            shmem_ulong_xor_to_all(dest, source, elem_count, 0, 0, npes, pSync);
+            shmem_int64_xor_to_all(dest, source, elem_count, 0, 0, npes, pSync);
 #elif defined(USE_15)
-            shmem_ulong_xor_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
+            shmem_int64_xor_reduce(SHMEM_TEAM_WORLD, dest, source, elem_count);
 #endif
         }
     }
